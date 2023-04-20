@@ -26,7 +26,6 @@
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/server_hosted_text_view"
             android:id="@+id/server_ip"
-            android:text="192.168.8.100"
             android:textAppearance="@style/TextAppearance.WifiMeeting.TextInputLayout.HintText" />
     </RelativeLayout>
 

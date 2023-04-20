@@ -1,9 +1,13 @@
 package com.example.wifimeeting.page;
 
+import android.content.Context;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.text.format.Formatter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -27,7 +31,9 @@ public class LectureHomePage extends Fragment {
         final TextInputEditText portEditText = view.findViewById(R.id.port_edit_text);
         final TextInputLayout lecturerNameTextInput = view.findViewById(R.id.lecturer_name_text_input);
         final TextInputEditText lecturerNameEditText = view.findViewById(R.id.lecturer_name_edit_text);
+        final TextView serverTextView = view.findViewById(R.id.server_ip_text_view);
 
+        serverTextView.setText(getWiFiIpAddress());
         portEditText.setText(Constants.DEFAULT_PORT);
 
         joinLectureButton.setOnClickListener(new View.OnClickListener() {
@@ -53,5 +59,11 @@ public class LectureHomePage extends Fragment {
         });
 
         return view;
+    }
+
+    private String getWiFiIpAddress (){
+        WifiManager wifiManager = (WifiManager) getContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        wifiManager.setWifiEnabled(true);
+        return Formatter.formatIpAddress(wifiManager.getConnectionInfo().getIpAddress());
     }
 }

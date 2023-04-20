@@ -1,15 +1,19 @@
 package com.example.wifimeeting.page;
 
+import android.content.Context;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.text.format.Formatter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.example.wifimeeting.navigation.NavigationHost;
 import com.example.wifimeeting.R;
+import com.example.wifimeeting.navigation.NavigationHost;
 import com.example.wifimeeting.utils.Constants;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -24,13 +28,13 @@ public class StudentHomePage extends Fragment {
 
         MaterialButton joinLectureButton = view.findViewById(R.id.join_lecture_button);
         MaterialButton smallGroupDiscussionButton = view.findViewById(R.id.small_group_discussion_button);
-
         final TextInputLayout portTextInput = view.findViewById(R.id.port_text_input);
         final TextInputEditText portEditText = view.findViewById(R.id.port_edit_text);
-
         final TextInputLayout studentNameTextInput = view.findViewById(R.id.student_name_text_input);
         final TextInputEditText studentNameEditText = view.findViewById(R.id.student_name_edit_text);
+        final TextView serverTextView = view.findViewById(R.id.server_ip);
 
+        serverTextView.setText(getWiFiIpAddress());
         portEditText.setText(Constants.DEFAULT_PORT);
 
         smallGroupDiscussionButton.setOnClickListener(new View.OnClickListener() {
@@ -65,5 +69,11 @@ public class StudentHomePage extends Fragment {
         });
 
         return view;
+    }
+
+    private String getWiFiIpAddress (){
+        WifiManager wifiManager = (WifiManager) getContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        wifiManager.setWifiEnabled(true);
+        return Formatter.formatIpAddress(wifiManager.getConnectionInfo().getIpAddress());
     }
 }
