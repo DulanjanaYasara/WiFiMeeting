@@ -31,8 +31,8 @@
         android:id="@+id/border"
         android:layout_width="wrap_content"
         android:layout_height="1dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="12dp"
+        android:layout_marginTop="@dimen/half_parent_page_padding"
+        android:layout_marginBottom="@dimen/half_parent_page_padding"
         android:background="@color/colorPrimary"
         android:layout_above="@id/member_card_layout"/>
 

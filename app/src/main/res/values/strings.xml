@@ -27,6 +27,7 @@
     <string name="password_mandatory">Password is required</string>
     <string name="error_password">Password character count exceeded</string>
     <string name="lecturer_name_mandatory">Lecturer name is required</string>
+    <string name="not_wifi_connected">Wi-Fi Connection is required</string>
 
 
     <string name="username">Username</string>
