@@ -29,6 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/password"
+        app:passwordToggleEnabled="true"
         app:errorEnabled="true">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -50,13 +51,5 @@
             android:layout_alignParentEnd="true"
             android:text="@string/login" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/cancel_button"
-            style="@style/Widget.WifiMeeting.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/button_spacing"
-            android:layout_toStartOf="@id/login_button"
-            android:text="@string/cancel" />
     </RelativeLayout>
 </LinearLayout>

@@ -15,6 +15,7 @@ import com.example.wifimeeting.navigation.NavigationHost;
 import com.example.wifimeeting.R;
 import com.example.wifimeeting.utils.Constants;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -63,8 +64,10 @@ public class LecturerLoginPage extends Fragment {
                 }
 
                 if (usernameTextInput.getError() == null && passwordTextInput.getError() == null) {
-                    // Navigate to the next Fragment
-                    ((NavigationHost) getActivity()).navigateTo(new LectureHomePage(), true);
+                    if(isPasswordAuthenticated(usernameEditText.getText().toString().trim(), passwordEditText.getText().toString()))
+                        ((NavigationHost) getActivity()).navigateTo(new LectureHomePage(), true);
+                    else
+                        Snackbar.make(view, R.string.login_failed, Snackbar.LENGTH_SHORT).show();
                 }
             }
         });
@@ -74,5 +77,9 @@ public class LecturerLoginPage extends Fragment {
 
     private boolean isPasswordValid(@Nullable Editable text) {
         return text != null && text.length() <= Constants.PASSWORD_MAX_LENGTH;
+    }
+
+    private boolean isPasswordAuthenticated(String username, String pwd){
+        return Constants.SEC_USERNAME.equalsIgnoreCase(username) && Constants.SEC_PWD.equals(pwd);
     }
 }
