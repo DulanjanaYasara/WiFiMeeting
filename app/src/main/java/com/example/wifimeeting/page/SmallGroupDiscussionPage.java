@@ -129,7 +129,7 @@ public class SmallGroupDiscussionPage extends Fragment {
 
                 if (memberListTextView.getText() == null || memberListTextView.getText().toString().trim().equals("")) {
                     selectMembersTextInput.setError(getString(R.string.members_mandatory));
-                } else if (memberListTextView.getText().toString().trim().split(Constants.MEMBERS_SEPARATOR).length > Constants.SMALL_GROUP_DISCUSSION_MEMBER_COUNT){
+                } else if (memberListTextView.getText().toString().trim().split(Constants.MEMBERS_SEPARATOR).length > Constants.SMALL_GROUP_DISCUSSION_MEMBER_MAX_COUNT){
                     selectMembersTextInput.setError(getString(R.string.max_count_exceeded));
                 } else {
                     selectMembersTextInput.setError(null);
