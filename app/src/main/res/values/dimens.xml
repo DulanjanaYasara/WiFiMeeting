@@ -5,7 +5,7 @@
     <dimen name="topic_below_padding">30dp</dimen>
     <dimen name="text_input_height">56dp</dimen>
     <dimen name="button_spacing">12dp</dimen>
-    <dimen name="mute_unmute_button_mid_width">130dp</dimen>
+    <dimen name="mute_unmute_button_mid_width">138dp</dimen>
     <dimen name="icon_button_padding">10dp</dimen>
 
     <dimen name="member_card_button_edge_margin">33dp</dimen>
