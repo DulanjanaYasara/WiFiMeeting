@@ -6,22 +6,23 @@
     app:cardBackgroundColor="@android:color/transparent"
     app:cardElevation="0dp"
     app:strokeWidth="1dp"
-    app:strokeColor="@color/colorAccent"
+    app:strokeColor="@color/colorPrimary"
     app:cardPreventCornerOverlap="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="10dp">
 
         <ImageView
             android:id="@+id/imageButton"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:padding="10dp"
+
             android:scaleType="fitCenter"
             app:srcCompat="@drawable/baseline_person_24"
-            app:tint="@color/colorAccent" />
+            app:tint="@color/colorPrimaryDark" />
 
         <TextView
             android:id="@+id/member_name"
@@ -30,37 +31,6 @@
             android:text="@string/member_name"
             android:textAlignment="center"
             android:textAppearance="?attr/textAppearanceSubtitle1" />
-
-        <RelativeLayout
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:gravity="center"
-            >
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/mute_unmute_button"
-                style="@style/Widget.WifiMeeting.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                app:icon="@drawable/baseline_mic_off_24"
-                app:iconGravity="textStart"
-                app:iconPadding="0dp"
-                app:iconTint="@color/colorPrimaryDark"
-                />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/leave_button"
-                style="@style/Widget.WifiMeeting.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:icon="@drawable/baseline_call_end_24"
-                app:iconGravity="textStart"
-                app:iconPadding="0dp"
-                app:iconTint="@color/warningColor"
-                />
-
-        </RelativeLayout>
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

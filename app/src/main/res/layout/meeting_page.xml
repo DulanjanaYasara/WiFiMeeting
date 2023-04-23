@@ -36,13 +36,70 @@
         android:background="@color/colorPrimary"
         android:layout_above="@id/member_card_layout"/>
 
-    <LinearLayout
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/member_card_layout"
-        android:layout_width="wrap_content"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        >
-        <include layout="@layout/member_card" />
-    </LinearLayout>
+        app:cardBackgroundColor="@android:color/transparent"
+        app:cardElevation="0dp"
+        app:cardPreventCornerOverlap="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/imageButton"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:padding="10dp"
+                android:scaleType="fitEnd"
+                app:srcCompat="@drawable/baseline_person_24"
+                app:tint="@color/colorPrimaryDark" />
+
+            <TextView
+                android:id="@+id/member_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/member_name"
+                android:textAlignment="viewEnd"
+                android:textAppearance="?attr/textAppearanceSubtitle1" />
+
+            <RelativeLayout
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                >
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/mute_unmute_button"
+                    style="@style/Widget.WifiMeeting.Button"
+                    android:layout_width="wrap_content"
+                    android:minWidth="@dimen/mute_unmute_button_mid_width"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:text="@string/mute"
+                    app:icon="@drawable/baseline_mic_off_24"
+                    />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/leave_button"
+                    style="@style/Widget.WifiMeeting.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/button_spacing"
+                    android:text="@string/leave"
+                    android:layout_toStartOf="@id/mute_unmute_button"
+                    app:icon="@drawable/baseline_call_end_24"
+                    app:iconPadding="@dimen/icon_button_padding"
+                    app:iconTint="@color/warningColor"
+                    />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
 </RelativeLayout>

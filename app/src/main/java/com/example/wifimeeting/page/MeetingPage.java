@@ -1,5 +1,6 @@
 package com.example.wifimeeting.page;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,18 +11,23 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.wifimeeting.R;
 import com.example.wifimeeting.card.MemberCardRecyclerViewAdapter;
 import com.example.wifimeeting.card.MemberEntry;
 import com.example.wifimeeting.card.MemberGridItemDecoration;
-import com.example.wifimeeting.R;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class MeetingPage extends Fragment {
+
+    MaterialButton leaveButton;
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.meeting_page, container, false);
-        
+        leaveButton = view.findViewById(R.id.leave_button);
+
         // Set up the RecyclerView
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
@@ -32,7 +38,33 @@ public class MeetingPage extends Fragment {
         int largePadding = getResources().getDimensionPixelSize(R.dimen.member_grid_spacing_small);
         int smallPadding = getResources().getDimensionPixelSize(R.dimen.member_grid_spacing_small);
         recyclerView.addItemDecoration(new MemberGridItemDecoration(largePadding, smallPadding));
+
+        leaveButton.setOnClickListener(leaveButtonClickEvent());
         
         return view;
+    }
+
+    private View.OnClickListener leaveButtonClickEvent (){
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_App_MaterialAlertDialog)
+                        .setTitle(R.string.confirm)
+                        .setMessage(R.string.leave_meeting_confirmation)
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        })
+                        .show();
+            }
+        };
     }
 }

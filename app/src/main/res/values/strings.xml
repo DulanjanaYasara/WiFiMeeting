@@ -12,9 +12,12 @@
     <string name="select_group">Select Group</string>
     <string name="create">Create</string>
     <string name="join">Join</string>
+    <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="login">Login</string>
     <string name="join_lecture">Join Lecture</string>
+    <string name="confirm">Confirm</string>
+    <string name="leave_meeting_confirmation">Are you sure you want to leave meeting?</string>
 
     <!--    Error Messages-->
     <string name="port_mandatory">Port is required</string>

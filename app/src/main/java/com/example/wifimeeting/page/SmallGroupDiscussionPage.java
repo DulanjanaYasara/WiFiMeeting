@@ -58,7 +58,7 @@ public class SmallGroupDiscussionPage extends Fragment {
             public void onClick(View view) {
 
                 MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(view.getContext(), R.style.ThemeOverlay_App_MaterialAlertDialog);
-                builder.setTitle("Select Member");
+                builder.setTitle(R.string.select_members);
                 builder.setCancelable(false);
                 builder.setMultiChoiceItems(memberArray, selectedMember, new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
@@ -71,7 +71,7 @@ public class SmallGroupDiscussionPage extends Fragment {
                         }
                     }
                 });
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         StringBuilder stringBuilder = new StringBuilder();
@@ -87,7 +87,7 @@ public class SmallGroupDiscussionPage extends Fragment {
                         memberListTextView.setText(stringBuilder.toString());
                     }
                 });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.dismiss();
