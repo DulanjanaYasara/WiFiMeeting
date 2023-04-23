@@ -17,18 +17,21 @@ import com.example.wifimeeting.R;
 import com.example.wifimeeting.card.MemberCardRecyclerViewAdapter;
 import com.example.wifimeeting.card.MemberEntry;
 import com.example.wifimeeting.card.MemberGridItemDecoration;
+import com.example.wifimeeting.navigation.BackPressedListener;
 import com.example.wifimeeting.utils.Constants;
 import com.example.wifimeeting.utils.MyDetails;
 import com.example.wifimeeting.utils.Role;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-public class MeetingPage extends Fragment {
+public class MeetingPage extends Fragment implements BackPressedListener{
 
     MaterialButton leaveButton, muteUnmuteButton;
     TextView memberName;
+    MaterialAlertDialogBuilder leaveAlertDialog;
 
     private long muteUnmuteButtonLastClickTime = 0;
+    public static BackPressedListener backPressedListener;
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -41,6 +44,23 @@ public class MeetingPage extends Fragment {
         if(this.getArguments() != null){
             readyUiView(this.getArguments());
         }
+
+        //leave alert dialog initialize
+        leaveAlertDialog =  new MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_App_MaterialAlertDialog)
+                .setTitle(R.string.confirm)
+                .setMessage(R.string.leave_meeting_confirmation)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        requireFragmentManager().popBackStack();
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
 
         // Set up the RecyclerView
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
@@ -106,23 +126,30 @@ public class MeetingPage extends Fragment {
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_App_MaterialAlertDialog)
-                        .setTitle(R.string.confirm)
-                        .setMessage(R.string.leave_meeting_confirmation)
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-
-                            }
-                        })
-                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-
-                            }
-                        })
-                        .show();
+               leaveAlertDialog.show();
             }
         };
+    }
+
+    // Overriding onPause() method
+    @Override
+    public void onPause() {
+        // passing null value to backPressedListener
+        backPressedListener=null;
+        super.onPause();
+    }
+
+
+    // Overriding onResume() method
+    @Override
+    public void onResume() {
+        super.onResume();
+        // passing context of fragment to backPressedListener
+        backPressedListener=this;
+    }
+
+    @Override
+    public void onBackPressed() {
+        leaveAlertDialog.show();
     }
 }
