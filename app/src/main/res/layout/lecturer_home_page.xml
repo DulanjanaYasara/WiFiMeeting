@@ -16,7 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:text="@string/server_hosted"
+            android:text="@string/my_address"
             android:textAllCaps="true"
             android:textAppearance="@style/TextAppearance.WifiMeeting.TextInputLayout.HintText" />
 

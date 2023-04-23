@@ -47,7 +47,7 @@ public class StudentHomePage extends Fragment {
         studentNameEditText = view.findViewById(R.id.student_name_edit_text);
         serverTextView = view.findViewById(R.id.server_ip);
 
-        serverTextView.setText(getWiFiIpAddress());
+        serverTextView.setText(" "+getWiFiIpAddress());
         portEditText.setText(Constants.DEFAULT_PORT);
 
         smallGroupDiscussionButton.setOnClickListener(new View.OnClickListener() {

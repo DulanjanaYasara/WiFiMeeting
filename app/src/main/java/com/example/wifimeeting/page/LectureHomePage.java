@@ -43,7 +43,7 @@ public class LectureHomePage extends Fragment {
         lecturerNameEditText = view.findViewById(R.id.lecturer_name_edit_text);
         serverTextView = view.findViewById(R.id.server_ip_text_view);
 
-        serverTextView.setText(getWiFiIpAddress());
+        serverTextView.setText(" "+getWiFiIpAddress());
         portEditText.setText(Constants.DEFAULT_PORT);
 
         joinLectureButton.setOnClickListener(new View.OnClickListener() {
