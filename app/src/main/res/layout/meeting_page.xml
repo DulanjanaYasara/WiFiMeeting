@@ -58,12 +58,13 @@
                 android:padding="10dp"
                 android:scaleType="fitEnd"
                 app:srcCompat="@drawable/baseline_person_24"
-                app:tint="@color/colorPrimaryDark" />
+                app:tint="@color/colorAccent" />
 
             <TextView
                 android:id="@+id/member_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textStyle="bold"
                 android:text="@string/member_name"
                 android:textAlignment="viewEnd"
                 android:textAppearance="?attr/textAppearanceSubtitle1" />
