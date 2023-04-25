@@ -14,11 +14,11 @@ public class Constants {
     public static final String SEC_PWD = "1234";
 
     //Actions
-    public static final String JOIN = "JO";
-    public static final String PRESENT = "PR";
-    public static final String LEAVE = "LE";
-    public static final String ABSENT = "AB";
-    public static final String MUTE = "MU";
+    public static final String JOIN_ACTION = "JO";
+    public static final String PRESENT_ACTION = "PR";
+    public static final String LEAVE_ACTION = "LE";
+    public static final String ABSENT_ACTION = "AB";
+    public static final String MUTE_ACTION = "MU";
 
     //Port Allocation
     public static final int AUDIO_CALL_BROADCAST_PORT = 50000;
@@ -31,7 +31,12 @@ public class Constants {
     public static final int SAMPLE_INTERVAL = 20; // Milliseconds
     public static final int SAMPLE_SIZE = 2; // Bytes
 
+    public static final int BROADCAST_BUF_SIZE = 1024;
+
     //Logging Tags
     public static final String AUDIO_CALL_LOG_TAG = "AudioCall";
+    public static final String JOIN_MEETING_LOG_TAG = "JoinMeeting";
+    public static final String LEAVE_MEETING_LOG_TAG = "LeaveMeeting";
+    public static final String MUTE_UNMUTE_LOG_TAG = "MuteUnmute";
 
 }
