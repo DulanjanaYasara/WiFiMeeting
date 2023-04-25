@@ -21,9 +21,17 @@ public class Constants {
     public static final String MUTE = "MU";
 
     //Port Allocation
-    public static final String AUDIO_CALL_BROADCAST_PORT = "50000";
-    public static final String MARK_PRESENCE_BROADCAST_PORT = "50001";
-    public static final String MARK_ABSENCE_BROADCAST_PORT = "50002";
-    public static final String MUTE_UNMUTE_BROADCAST_PORT = "50003";
+    public static final int AUDIO_CALL_BROADCAST_PORT = 50000;
+    public static final int MARK_PRESENCE_BROADCAST_PORT = 50001;
+    public static final int MARK_ABSENCE_BROADCAST_PORT = 50002;
+    public static final int MUTE_UNMUTE_BROADCAST_PORT = 50003;
+
+    //Audio Call configurations
+    public static final int SAMPLE_RATE = 8000; // Hertz
+    public static final int SAMPLE_INTERVAL = 20; // Milliseconds
+    public static final int SAMPLE_SIZE = 2; // Bytes
+
+    //Logging Tags
+    public static final String AUDIO_CALL_LOG_TAG = "AudioCall";
 
 }
