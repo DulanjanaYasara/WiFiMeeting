@@ -8,6 +8,7 @@ import android.media.MediaRecorder;
 import android.util.Log;
 
 import com.example.wifimeeting.utils.Constants;
+import com.example.wifimeeting.utils.Role;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -23,13 +24,15 @@ public class AudioCall {
     private InetAddress address; // Address to call
     private boolean mic = false; // Enable mic?
     private boolean speakers = false; // Enable speakers?
+    private Role role;
 
-    public AudioCall(InetAddress address) {
+    public AudioCall(InetAddress address, Role role) {
         this.address = address;
     }
 
     public void startCall() {
-        startMic();
+        Log.i(Constants.AUDIO_CALL_LOG_TAG, "Starting call!");
+        if(role.equals(Role.LECTURER)) startMic();
         startSpeakers();
     }
 
@@ -37,6 +40,32 @@ public class AudioCall {
         Log.i(Constants.AUDIO_CALL_LOG_TAG, "Ending call!");
         muteMic();
         muteSpeakers();
+    }
+
+    public void muteMeFromMeeting() {
+        Log.i(Constants.AUDIO_CALL_LOG_TAG, "Muting from call!");
+        if(speakers) {
+            if (mic) {
+                muteMic();
+            } else {
+                Log.i(Constants.AUDIO_CALL_LOG_TAG, "Already mute the call!");
+            }
+        } else {
+            Log.i(Constants.AUDIO_CALL_LOG_TAG, "Already left the call!");
+        }
+    }
+
+    public void unmuteMeFromMeeting() {
+        Log.i(Constants.AUDIO_CALL_LOG_TAG, "Unmuting from call!");
+        if(speakers) {
+            if (mic) {
+                Log.i(Constants.AUDIO_CALL_LOG_TAG, "Already unmute the call!");
+            } else {
+                startMic();
+            }
+        } else {
+            Log.i(Constants.AUDIO_CALL_LOG_TAG, "Already left the call!");
+        }
     }
 
     public void muteMic() {
