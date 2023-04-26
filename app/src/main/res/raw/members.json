@@ -1,59 +1,78 @@
 [
   {
-    "memberName" : "Dulanjana"
+    "memberName" : "Dulanjana",
+    "isMute" : true
   },
   {
-    "memberName" : "Udesh"
+    "memberName" : "Udesh",
+    "isMute" : true
   },
   {
-    "memberName" : "Chamindu"
+    "memberName" : "Chamindu",
+    "isMute" : true
   },
   {
-    "memberName" : "Yasara"
+    "memberName" : "Yasara",
+    "isMute" : false
   },
   {
-    "memberName" : "Kalpa"
+    "memberName" : "Kalpa",
+    "isMute" : true
   },
   {
-    "memberName" : "Madhawa"
+    "memberName" : "Madhawa",
+    "isMute" : true
   },
   {
-    "memberName" : "Sadunika"
+    "memberName" : "Sadunika",
+    "isMute" : true
   },
   {
-    "memberName" : "Pamuditha"
+    "memberName" : "Pamuditha",
+    "isMute" : true
   },
   {
-    "memberName" : "Yase"
+    "memberName" : "Yase",
+    "isMute" : true
   },
   {
-    "memberName" : "Jaye"
+    "memberName" : "Jaye",
+    "isMute" : false
   },
   {
-    "memberName" : "Kavinda"
+    "memberName" : "Kavinda",
+    "isMute" : false
   },
   {
-    "memberName" : "Kamal"
+    "memberName" : "Kamal",
+    "isMute" : true
   },
   {
-    "memberName" : "Amal"
+    "memberName" : "Amal",
+    "isMute" : true
   },
   {
-    "memberName" : "Wimal"
+    "memberName" : "Wimal",
+    "isMute" : true
   },
   {
-    "memberName" : "Namal"
+    "memberName" : "Namal",
+    "isMute" : true
   },
   {
-    "memberName" : "Bimal"
+    "memberName" : "Bimal",
+    "isMute" : true
   },
   {
-    "memberName" : "Sunimal"
+    "memberName" : "Sunimal",
+    "isMute" : true
   },
   {
-    "memberName" : "Kithmal"
+    "memberName" : "Kithmal",
+    "isMute" : true
   },
   {
-    "memberName" : "Ranmal"
+    "memberName" : "Ranmal",
+    "isMute" : true
   }
 ]

@@ -25,10 +25,13 @@ public class MemberEntry {
     private static final String TAG = MemberEntry.class.getSimpleName();
 
     public final String memberName;
+    public final Boolean isMute;
 
 
-    public MemberEntry(String memberName) {
+    public MemberEntry(String memberName, Boolean isMute) {
+
         this.memberName = memberName;
+        this.isMute = isMute;
     }
 
     /**
