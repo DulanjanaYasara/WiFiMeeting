@@ -32,6 +32,14 @@ public class MeetingPage extends Fragment implements BackPressedListener{
 
     private long muteUnmuteButtonLastClickTime = 0;
     public static BackPressedListener backPressedListener;
+
+    /**
+     * My Details
+     */
+    private String name;
+    private Boolean isMute;
+    private String role;
+
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -42,7 +50,11 @@ public class MeetingPage extends Fragment implements BackPressedListener{
         memberName = view.findViewById(R.id.member_name);
 
         if(this.getArguments() != null){
-            readyUiView(this.getArguments());
+            Bundle bundle = this.getArguments();
+            name = bundle.getString(MyDetails.NAME.toString());
+            isMute = bundle.getBoolean(MyDetails.IS_MUTE.toString());
+            role = bundle.getString(MyDetails.ROLE.toString());
+            readyUiView();
         }
 
         //leave alert dialog initialize
@@ -79,23 +91,18 @@ public class MeetingPage extends Fragment implements BackPressedListener{
         return view;
     }
 
-    private void readyUiView (Bundle bundle){
-        if(bundle.getString(MyDetails.NAME.toString())!= null)
-            memberName.setText(bundle.getString(MyDetails.NAME.toString()));
-        if(bundle.getBoolean(MyDetails.IS_MUTE.toString())){
-
-            if(bundle.getString(MyDetails.ROLE.toString()) != null){
-                muteUnmuteButton.setText(
-                        bundle.getString(MyDetails.ROLE.toString()).equals(Role.LECTURER.toString())?
-                                R.string.mute:
-                                R.string.unmute);
+    private void readyUiView (){
+        if(name!= null)
+            memberName.setText(name);
+        if(isMute){
+            if(role != null){
+                muteUnmuteButton.setText(role.equals(Role.LECTURER.toString())? R.string.mute: R.string.unmute);
                 muteUnmuteButton.setIcon(
-                        bundle.getString(MyDetails.ROLE.toString()).equals(Role.LECTURER.toString())?
+                        role.equals(Role.LECTURER.toString())?
                                 getResources().getDrawable(R.drawable.baseline_mic_off_24):
                                 getResources().getDrawable(R.drawable.baseline_mic_24));
             }
         }
-
     }
 
     private View.OnClickListener muteUnmuteButtonClickEvent() {
