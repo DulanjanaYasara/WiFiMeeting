@@ -1,4 +1,4 @@
-package com.example.wifimeeting.usecase.bigclassroomlecturesession.attendeemanager;
+package com.example.wifimeeting.usecase.bigclassroomlecturesession;
 
 import android.util.Log;
 
