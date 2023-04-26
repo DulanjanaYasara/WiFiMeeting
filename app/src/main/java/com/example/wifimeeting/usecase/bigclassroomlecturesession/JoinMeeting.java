@@ -30,6 +30,10 @@ public class JoinMeeting {
         broadcastJoinPresent(Constants.JOIN_ACTION, name, isMute);
     }
 
+    public HashMap<String, Boolean> getMembers() {
+        return members;
+    }
+
     /**
      * Adding new members information to the HashMap
      * if information exists update the value
