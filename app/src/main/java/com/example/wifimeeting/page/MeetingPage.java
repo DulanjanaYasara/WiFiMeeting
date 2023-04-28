@@ -15,20 +15,28 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wifimeeting.R;
 import com.example.wifimeeting.card.MemberCardRecyclerViewAdapter;
-import com.example.wifimeeting.card.MemberEntry;
 import com.example.wifimeeting.card.MemberGridItemDecoration;
 import com.example.wifimeeting.navigation.BackPressedListener;
+import com.example.wifimeeting.usecase.bigclassroomlecturesession.JoinMeeting;
+import com.example.wifimeeting.usecase.bigclassroomlecturesession.LeaveMeeting;
+import com.example.wifimeeting.usecase.bigclassroomlecturesession.MuteUnmuteMeeting;
+import com.example.wifimeeting.utils.AddressGenerator;
 import com.example.wifimeeting.utils.Constants;
 import com.example.wifimeeting.utils.MyDetails;
 import com.example.wifimeeting.utils.Role;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import java.net.InetAddress;
+import java.util.LinkedHashMap;
+
 public class MeetingPage extends Fragment implements BackPressedListener{
 
     MaterialButton leaveButton, muteUnmuteButton;
     TextView memberName;
     MaterialAlertDialogBuilder leaveAlertDialog;
+    MemberCardRecyclerViewAdapter memberCardRecyclerViewAdapter;
+    RecyclerView recyclerView;
 
     private long muteUnmuteButtonLastClickTime = 0;
     public static BackPressedListener backPressedListener;
@@ -36,9 +44,16 @@ public class MeetingPage extends Fragment implements BackPressedListener{
     /**
      * My Details
      */
-    private String name;
-    private Boolean isMute;
+    private String name = null;
+    private Boolean isMute = true;
     private String role;
+
+    private LinkedHashMap<String, Boolean> memberHashMap = new LinkedHashMap<>();
+    private InetAddress broadcastIp;
+
+    JoinMeeting joinMeeting;
+    LeaveMeeting leaveMeeting;
+    MuteUnmuteMeeting muteUnmuteMeeting;
 
     @Override
     public View onCreateView(
@@ -65,6 +80,7 @@ public class MeetingPage extends Fragment implements BackPressedListener{
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         requireFragmentManager().popBackStack();
+                        leaveMeeting();
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -74,21 +90,44 @@ public class MeetingPage extends Fragment implements BackPressedListener{
                     }
                 });
 
+        AddressGenerator addressGenerator = new AddressGenerator(view);
+        broadcastIp = addressGenerator.getBroadcastIp();
+
+        initializeMeeting();
         // Set up the RecyclerView
-        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2, RecyclerView.VERTICAL, false));
-        MemberCardRecyclerViewAdapter adapter = new MemberCardRecyclerViewAdapter(
-                MemberEntry.initProductEntryList(getResources()));
-        recyclerView.setAdapter(adapter);
-        int largePadding = getResources().getDimensionPixelSize(R.dimen.member_grid_spacing_small);
-        int smallPadding = getResources().getDimensionPixelSize(R.dimen.member_grid_spacing_small);
-        recyclerView.addItemDecoration(new MemberGridItemDecoration(largePadding, smallPadding));
+        initiateRecyclerView(view);
 
         leaveButton.setOnClickListener(leaveButtonClickEvent());
         muteUnmuteButton.setOnClickListener(muteUnmuteButtonClickEvent());
-        
+
         return view;
+    }
+
+    private void initializeMeeting(){
+
+        joinMeeting = new JoinMeeting(memberHashMap, name, isMute, broadcastIp);
+        leaveMeeting = new LeaveMeeting(memberHashMap, broadcastIp);
+        muteUnmuteMeeting = new MuteUnmuteMeeting(memberHashMap, broadcastIp);
+
+    }
+
+    private void leaveMeeting(){
+
+        joinMeeting.stopListeningJoinMeeting();
+        leaveMeeting.stopListeningLeaveMeeting();
+        muteUnmuteMeeting.stopListeningMuteUnmuteMeeting();
+
+    }
+
+    private void initiateRecyclerView(View view){
+        recyclerView = view.findViewById(R.id.recycler_view);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2, RecyclerView.VERTICAL, false));
+        memberCardRecyclerViewAdapter = new MemberCardRecyclerViewAdapter(memberHashMap);
+        recyclerView.setAdapter(memberCardRecyclerViewAdapter);
+        int largePadding = getResources().getDimensionPixelSize(R.dimen.member_grid_spacing_small);
+        int smallPadding = getResources().getDimensionPixelSize(R.dimen.member_grid_spacing_small);
+        recyclerView.addItemDecoration(new MemberGridItemDecoration(largePadding, smallPadding));
     }
 
     private void readyUiView (){
@@ -116,14 +155,14 @@ public class MeetingPage extends Fragment implements BackPressedListener{
                 }
                 muteUnmuteButtonLastClickTime = SystemClock.elapsedRealtime();
 
-                muteUnmuteButton.setText(
-                        muteUnmuteButton.getText().toString().equals(getString(R.string.unmute))?
-                                R.string.mute:
-                                R.string.unmute);
+                boolean isMuteValue = muteUnmuteButton.getText().toString().equals(getString(R.string.mute));
+
+                muteUnmuteButton.setText(isMuteValue? R.string.unmute: R.string.mute);
                 muteUnmuteButton.setIcon(
-                        muteUnmuteButton.getText().toString().equals(getString(R.string.unmute))?
-                                getResources().getDrawable(R.drawable.baseline_mic_24):
-                                getResources().getDrawable(R.drawable.baseline_mic_off_24));
+                        isMuteValue?
+                                getResources().getDrawable(R.drawable.baseline_mic_off_24):
+                                getResources().getDrawable(R.drawable.baseline_mic_24));
+                muteUnmuteMeeting.broadcastMuteUnmute(Constants.MUTE_ACTION,name, isMuteValue);
 
             }
         };

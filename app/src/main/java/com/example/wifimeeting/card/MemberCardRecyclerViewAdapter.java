@@ -1,5 +1,6 @@
 package com.example.wifimeeting.card;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,5 +58,13 @@ public class MemberCardRecyclerViewAdapter extends RecyclerView.Adapter<MemberCa
     @Override
     public int getItemCount() {
         return memberList.size();
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void updateData(LinkedHashMap<String, Boolean> newMemberList) {
+        memberList = newMemberList;
+
+        // notify the adapter that the data has changed
+        notifyDataSetChanged();
     }
 }
