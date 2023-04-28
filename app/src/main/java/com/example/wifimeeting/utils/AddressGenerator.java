@@ -14,7 +14,7 @@ public class AddressGenerator {
     private int ipAddress;
 
     public AddressGenerator(View view) {
-
+        generateAddress(view);
     }
 
     public int getIpAddress() {
