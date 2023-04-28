@@ -10,18 +10,21 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wifimeeting.R;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Adapter used to show a simple grid of members.
  */
 public class MemberCardRecyclerViewAdapter extends RecyclerView.Adapter<MemberCardViewHolder> {
 
-    private List<MemberEntry> memberList;
+    private LinkedHashMap<String, Boolean> memberList;
     private View layoutView;
 
-    public MemberCardRecyclerViewAdapter(List<MemberEntry> productList) {
-        this.memberList = productList;
+    public MemberCardRecyclerViewAdapter(LinkedHashMap<String, Boolean> memberList) {
+        this.memberList = memberList;
     }
 
     @NonNull
@@ -35,12 +38,17 @@ public class MemberCardRecyclerViewAdapter extends RecyclerView.Adapter<MemberCa
     public void onBindViewHolder(@NonNull final MemberCardViewHolder holder, final int position) {
 
         if (memberList != null && position < memberList.size()) {
-            MemberEntry member = memberList.get(position);
-            holder.memberName.setText(member.memberName);
+
+            Set<String> keySet = memberList.keySet();
+            List<String> listKeys = new ArrayList<>(keySet);
+            String key = listKeys.get(position);
+            Boolean value = memberList.get(key);
+
+            holder.memberName.setText(key);
 
             //background color change based on mute unmute
             holder.materialCardViewLayout.setCardBackgroundColor(
-                    member.isMute?
+                    Boolean.TRUE.equals(value) ?
                             ContextCompat.getColor(layoutView.getContext(), R.color.toolbarIconColor):
                             ContextCompat.getColor(layoutView.getContext(), R.color.colorPrimary));
         }

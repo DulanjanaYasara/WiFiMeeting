@@ -10,18 +10,18 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class JoinMeeting {
 
     private boolean LISTEN_JOIN_MEETING = true;
-    private HashMap<String, Boolean> members;
+    private LinkedHashMap<String, Boolean> members;
     private InetAddress broadcastIP;
     private String name;
     private Boolean isMute;
 
-    public JoinMeeting(String name, Boolean isMute, InetAddress broadcastIP) {
-        members = new HashMap<String, Boolean>();
+    public JoinMeeting(LinkedHashMap<String, Boolean> members, String name, Boolean isMute, InetAddress broadcastIP) {
+        this.members = members;
         this.broadcastIP = broadcastIP;
         this.name = name;
         this.isMute = isMute;
@@ -30,12 +30,8 @@ public class JoinMeeting {
         broadcastJoinPresent(Constants.JOIN_ACTION, name, isMute);
     }
 
-    public HashMap<String, Boolean> getMembers() {
-        return members;
-    }
-
     /**
-     * Adding new members information to the HashMap
+     * Adding new members information to the LinkedHashMap
      * if information exists update the value
      */
     public void presentMember(String name, Boolean isMute) {

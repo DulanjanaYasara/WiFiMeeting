@@ -10,15 +10,15 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class LeaveMeeting {
 
     private boolean LISTEN_LEAVE_MEETING = true;
-    private HashMap<String, Boolean> members;
+    private LinkedHashMap<String, Boolean> members;
     private InetAddress broadcastIP;
 
-    public LeaveMeeting(HashMap<String, Boolean> members, InetAddress broadcastIP) {
+    public LeaveMeeting(LinkedHashMap<String, Boolean> members, InetAddress broadcastIP) {
         this.members = members;
         this.broadcastIP = broadcastIP;
 
@@ -26,7 +26,7 @@ public class LeaveMeeting {
     }
 
     /**
-     * Removing members information from the HashMap
+     * Removing members information from the LinkedHashMap
      */
     public void leaveMember(String name) {
         if(members.containsKey(name)) {

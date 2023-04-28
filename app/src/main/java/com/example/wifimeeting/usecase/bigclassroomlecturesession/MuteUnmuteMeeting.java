@@ -10,15 +10,15 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class MuteUnmuteMeeting {
 
     private boolean LISTEN_MUTE_MEETING = true;
-    private HashMap<String, Boolean> members;
+    private LinkedHashMap<String, Boolean> members;
     private InetAddress broadcastIP;
 
-    public MuteUnmuteMeeting(HashMap<String, Boolean> members, InetAddress broadcastIP) {
+    public MuteUnmuteMeeting(LinkedHashMap<String, Boolean> members, InetAddress broadcastIP) {
         this.members = members;
         this.broadcastIP = broadcastIP;
 
@@ -26,7 +26,7 @@ public class MuteUnmuteMeeting {
     }
 
     /**
-     * Updating members information from the HashMap
+     * Updating members information from the LinkedHashMap
      */
     public void muteUnmuteMember(String name, Boolean isMute) {
         if (members.containsKey(name)) {

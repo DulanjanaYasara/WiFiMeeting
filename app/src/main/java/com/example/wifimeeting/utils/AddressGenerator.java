@@ -8,13 +8,13 @@ import android.view.View;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-public class IpGenerator {
+public class AddressGenerator {
 
     private InetAddress broadcastIp;
     private int ipAddress;
 
-    public IpGenerator(View view){
-        generateAddress(view);
+    public AddressGenerator(View view) {
+
     }
 
     public int getIpAddress() {

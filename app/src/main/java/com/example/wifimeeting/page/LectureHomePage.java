@@ -1,7 +1,6 @@
 package com.example.wifimeeting.page;
 
 import android.os.Bundle;
-import android.text.format.Formatter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +11,8 @@ import androidx.fragment.app.Fragment;
 
 import com.example.wifimeeting.R;
 import com.example.wifimeeting.navigation.NavigationHost;
+import com.example.wifimeeting.utils.AddressGenerator;
 import com.example.wifimeeting.utils.Constants;
-import com.example.wifimeeting.utils.IpGenerator;
 import com.example.wifimeeting.utils.MyDetails;
 import com.example.wifimeeting.utils.Role;
 import com.google.android.material.button.MaterialButton;
@@ -28,7 +27,6 @@ public class LectureHomePage extends Fragment {
     TextInputLayout portTextInput, lecturerNameTextInput;
     TextInputEditText portEditText, lecturerNameEditText;
     TextView serverTextView;
-    IpGenerator ipGenerator;
 
     @Override
     public View onCreateView(
@@ -43,8 +41,8 @@ public class LectureHomePage extends Fragment {
         lecturerNameEditText = view.findViewById(R.id.lecturer_name_edit_text);
         serverTextView = view.findViewById(R.id.server_ip_text_view);
 
-        ipGenerator = new IpGenerator(view);
-        serverTextView.setText(" "+ Formatter.formatIpAddress(ipGenerator.getIpAddress()));
+        AddressGenerator addressGenerator = new AddressGenerator(view);
+        serverTextView.setText(" "+ addressGenerator.getIpAddress());
         portEditText.setText(Constants.DEFAULT_PORT);
 
         joinLectureButton.setOnClickListener(new View.OnClickListener() {
