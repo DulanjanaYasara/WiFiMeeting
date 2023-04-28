@@ -123,7 +123,7 @@ public class MuteUnmuteMeeting {
 
                     String receivedAction = data.substring(0, 2);
                     String receiverName = data.substring(2, data.length() - 1);
-                    Boolean isMuteValue = Boolean.parseBoolean(data.substring(data.length() - 1));
+                    Boolean isMuteValue = data.endsWith("1");
 
                     if (receivedAction.equals(Constants.MUTE_ACTION)) {
                         Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "Mute unmute Meeting Listener received MUTE request");

@@ -129,7 +129,7 @@ public class JoinMeeting {
 
                     String receivedAction = data.substring(0, 2);
                     String receiverName = data.substring(2, data.length() - 1);
-                    Boolean isMuteValue = Boolean.parseBoolean(data.substring(data.length() - 1));
+                    Boolean isMuteValue = data.endsWith("1");
 
                     if (receivedAction.equals(Constants.JOIN_ACTION)) {
                         Log.i(Constants.JOIN_MEETING_LOG_TAG, "Join Meeting Listener received JOIN request");

@@ -22,7 +22,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="132dp"
         android:text="@string/startup_message"
         android:textAppearance="@style/TextAppearance.WifiMeeting.Title" />
 
