@@ -32,6 +32,7 @@
     <string name="lecturer_name_mandatory">Lecturer name is required</string>
     <string name="not_wifi_connected">Wi-Fi Connection is required</string>
     <string name="login_failed">Login Failed!</string>
+    <string name="permission_mandatory">Permission Required!</string>
 
 
     <string name="username">Username</string>

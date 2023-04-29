@@ -1,5 +1,6 @@
 package com.example.wifimeeting.page;
 
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.format.Formatter;
 import android.view.LayoutInflater;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.wifimeeting.R;
@@ -17,6 +19,7 @@ import com.example.wifimeeting.utils.Constants;
 import com.example.wifimeeting.utils.MyDetails;
 import com.example.wifimeeting.utils.Role;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -52,15 +55,20 @@ public class LectureHomePage extends Fragment {
                joinLectureValidations();
 
                 if(portTextInput.getError() == null && lecturerNameTextInput.getError() == null) {
-                    Bundle bundle = new Bundle();
-                    bundle.putString(MyDetails.NAME.toString(), Objects.requireNonNull(lecturerNameEditText.getText()).toString());
-                    bundle.putBoolean(MyDetails.IS_MUTE.toString(), false);
-                    bundle.putString(MyDetails.ROLE.toString(), Role.LECTURER.toString());
 
-                    MeetingPage meetingPage = new MeetingPage();
-                    meetingPage.setArguments(bundle);
-                    // Navigate to the next Fragment
-                    ((NavigationHost) getActivity()).navigateTo(meetingPage, true);
+                    if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
+                        Snackbar.make(view, R.string.permission_mandatory, Snackbar.LENGTH_SHORT).show();
+				    else {
+                        Bundle bundle = new Bundle();
+                        bundle.putString(MyDetails.NAME.toString(), Objects.requireNonNull(lecturerNameEditText.getText()).toString());
+                        bundle.putBoolean(MyDetails.IS_MUTE.toString(), false);
+                        bundle.putString(MyDetails.ROLE.toString(), Role.LECTURER.toString());
+
+                        MeetingPage meetingPage = new MeetingPage();
+                        meetingPage.setArguments(bundle);
+                        // Navigate to the next Fragment
+                        ((NavigationHost) getActivity()).navigateTo(meetingPage, true);
+                    }
                 }
             }
         });
