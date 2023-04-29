@@ -11,13 +11,13 @@ import java.net.UnknownHostException;
 public class AddressGenerator {
 
     private InetAddress broadcastIp;
-    private int ipAddress;
+    private InetAddress ipAddress;
 
     public AddressGenerator(View view) {
         generateAddress(view);
     }
 
-    public int getIpAddress() {
+    public InetAddress getIpAddress() {
         return ipAddress;
     }
 
@@ -29,17 +29,24 @@ public class AddressGenerator {
         try{
             WifiManager wifiManager = (WifiManager) view.getContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             wifiManager.setWifiEnabled(true);
-            ipAddress = wifiManager.getConnectionInfo().getIpAddress();
-            String addressString = toBroadcastIp(ipAddress);
-            broadcastIp = InetAddress.getByName(addressString);
+            int ip = wifiManager.getConnectionInfo().getIpAddress();
+            String ipAddressString = toIp(ip);
+            String broadcastAddressString = toBroadcastIp(ip);
+            broadcastIp = InetAddress.getByName(broadcastAddressString);
+            ipAddress = InetAddress.getByName(ipAddressString);
 
         } catch(UnknownHostException e) {
             Log.e(Constants.JOIN_MEETING_LOG_TAG,"UnknownHostException in get IP address: " + e);
         }
     }
 
-    // Returns converts an IP address in int format to a formatted string
+    // Returns converts an IP address in int format to a formatted broadcast string
     private String toBroadcastIp(int ip) {
         return (ip & 0xFF) + "." + ((ip >> 8) & 0xFF) + "." + ((ip >> 16) & 0xFF) + "." + "255";
+    }
+
+    // Returns converts an IP address in int format to a formatted ip string
+    private String toIp(int ip) {
+        return (ip & 0xFF) + "." + ((ip >> 8) & 0xFF) + "." + ((ip >> 16) & 0xFF) + "." + ((ip >> 24) & 0xFF);
     }
 }

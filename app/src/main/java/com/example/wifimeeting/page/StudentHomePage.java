@@ -2,7 +2,6 @@ package com.example.wifimeeting.page;
 
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.text.format.Formatter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,7 +49,7 @@ public class StudentHomePage extends Fragment {
         serverTextView = view.findViewById(R.id.server_ip);
 
         AddressGenerator addressGenerator = new AddressGenerator(view);
-        serverTextView.setText(" "+ Formatter.formatIpAddress(addressGenerator.getIpAddress()));
+        serverTextView.setText(" "+ addressGenerator.getIpAddress());
         portEditText.setText(Constants.DEFAULT_PORT);
 
         smallGroupDiscussionButton.setOnClickListener(new View.OnClickListener() {

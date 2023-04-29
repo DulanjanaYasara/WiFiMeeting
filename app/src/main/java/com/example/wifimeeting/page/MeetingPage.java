@@ -100,7 +100,7 @@ public class MeetingPage extends Fragment implements BackPressedListener{
 
         // Set up the RecyclerView
         initiateRecyclerView(view);
-        audioCall = new AudioCall(broadcastIp, isMute);
+        audioCall = new AudioCall(addressGenerator.getIpAddress(), broadcastIp, isMute);
         initializeMeeting();
 
         leaveButton.setOnClickListener(leaveButtonClickEvent());

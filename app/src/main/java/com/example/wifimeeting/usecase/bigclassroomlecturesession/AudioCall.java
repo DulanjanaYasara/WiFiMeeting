@@ -22,11 +22,13 @@ public class AudioCall {
     //Calculating the buffer size for an Android audio track (in bytes)
     private static final int BUF_SIZE = Constants.SAMPLE_INTERVAL * Constants.SAMPLE_INTERVAL * Constants.SAMPLE_SIZE * 2;
     private InetAddress address; // Address to call
+    private InetAddress myAddress; // My IP Address
     private boolean mic = false; // Enable mic?
     private boolean speakers = false; // Enable speakers?
     private Boolean isMute;
 
-    public AudioCall(InetAddress address, Boolean isMute) {
+    public AudioCall(InetAddress myAddress, InetAddress address, Boolean isMute) {
+        this.myAddress = myAddress;
         this.isMute = isMute;
         this.address = address;
     }
@@ -165,8 +167,12 @@ public class AudioCall {
                         while (speakers) {
                             DatagramPacket packet = new DatagramPacket(buf, BUF_SIZE);
                             socket.receive(packet);
-                            Log.i(Constants.AUDIO_CALL_LOG_TAG, "Packet received: " + packet.getLength());
-                            track.write(packet.getData(), 0, BUF_SIZE);
+
+                            // check if the sender is the current host
+                            if (!packet.getAddress().equals(myAddress)) {
+                                Log.i(Constants.AUDIO_CALL_LOG_TAG, "Packet received: " + packet.getLength());
+                                track.write(packet.getData(), 0, BUF_SIZE);
+                            }
                         }
 
                         socket.disconnect();
