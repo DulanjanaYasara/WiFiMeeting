@@ -2,6 +2,7 @@ package com.example.wifimeeting.usecase.bigclassroomlecturesession;
 
 import android.util.Log;
 
+import com.example.wifimeeting.page.MeetingPage;
 import com.example.wifimeeting.utils.Constants;
 
 import java.io.IOException;
@@ -10,18 +11,17 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.LinkedHashMap;
 
 public class JoinMeeting {
 
     private boolean LISTEN_JOIN_MEETING = true;
-    private LinkedHashMap<String, Boolean> members;
+    private MeetingPage uiPage;
     private InetAddress broadcastIP;
     private String name;
     private Boolean isMute;
 
-    public JoinMeeting(LinkedHashMap<String, Boolean> members, String name, Boolean isMute, InetAddress broadcastIP) {
-        this.members = members;
+    public JoinMeeting(MeetingPage uiPage, String name, Boolean isMute, InetAddress broadcastIP) {
+        this.uiPage = uiPage;
         this.broadcastIP = broadcastIP;
         this.name = name;
         this.isMute = isMute;
@@ -29,21 +29,6 @@ public class JoinMeeting {
         listenJoinMeeting();
         broadcastJoinPresent(Constants.JOIN_ACTION, name, isMute);
     }
-
-    /**
-     * Adding new members information to the LinkedHashMap
-     * if information exists update the value
-     */
-    public void presentMember(String name, Boolean isMute) {
-        if (members.containsKey(name)) {
-            Log.i(Constants.JOIN_MEETING_LOG_TAG, "Updating member: " + name);
-        } else {
-            Log.i(Constants.JOIN_MEETING_LOG_TAG, "Adding member: " + name);
-        }
-        members.put(name, isMute);
-        Log.i(Constants.JOIN_MEETING_LOG_TAG, "#Members: " + members.size());
-    }
-
 
     /**
      * Broadcast the JOIN or PRESENT action
@@ -82,7 +67,6 @@ public class JoinMeeting {
         });
         broadcastThread.start();
     }
-
 
     /**
      * Listening thread for join meeting
@@ -133,12 +117,12 @@ public class JoinMeeting {
 
                     if (receivedAction.equals(Constants.JOIN_ACTION)) {
                         Log.i(Constants.JOIN_MEETING_LOG_TAG, "Join Meeting Listener received JOIN request");
-                        presentMember(receiverName, isMuteValue);
+                        uiPage.updateMemberHashMap(receivedAction, receiverName, isMuteValue);
                         broadcastJoinPresent(Constants.PRESENT_ACTION, name, isMute);
 
                     } else  if (receivedAction.equals(Constants.PRESENT_ACTION)) {
                         Log.i(Constants.JOIN_MEETING_LOG_TAG, "Join Meeting Listener received PRESENT request");
-                        presentMember(receiverName,isMuteValue);
+                        uiPage.updateMemberHashMap(receivedAction, receiverName, isMuteValue);
 
                     } else {
                         Log.w(Constants.JOIN_MEETING_LOG_TAG, "Join Meeting Listener received invalid request: " + receivedAction);

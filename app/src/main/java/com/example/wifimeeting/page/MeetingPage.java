@@ -2,7 +2,9 @@ package com.example.wifimeeting.page;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +37,7 @@ public class MeetingPage extends Fragment implements BackPressedListener{
     MaterialButton leaveButton, muteUnmuteButton;
     TextView memberName;
     MaterialAlertDialogBuilder leaveAlertDialog;
-    MemberCardRecyclerViewAdapter memberCardRecyclerViewAdapter;
+    MemberCardRecyclerViewAdapter viewAdapter;
     RecyclerView recyclerView;
 
     private long muteUnmuteButtonLastClickTime = 0;
@@ -49,6 +51,7 @@ public class MeetingPage extends Fragment implements BackPressedListener{
     private String role;
 
     private LinkedHashMap<String, Boolean> memberHashMap = new LinkedHashMap<>();
+    Handler handler = new Handler();
     private InetAddress broadcastIp;
 
     JoinMeeting joinMeeting;
@@ -93,9 +96,9 @@ public class MeetingPage extends Fragment implements BackPressedListener{
         AddressGenerator addressGenerator = new AddressGenerator(view);
         broadcastIp = addressGenerator.getBroadcastIp();
 
-        initializeMeeting();
         // Set up the RecyclerView
         initiateRecyclerView(view);
+        initializeMeeting();
 
         leaveButton.setOnClickListener(leaveButtonClickEvent());
         muteUnmuteButton.setOnClickListener(muteUnmuteButtonClickEvent());
@@ -104,18 +107,68 @@ public class MeetingPage extends Fragment implements BackPressedListener{
     }
 
     private void initializeMeeting(){
-
-        joinMeeting = new JoinMeeting(memberHashMap, name, isMute, broadcastIp);
-        leaveMeeting = new LeaveMeeting(memberHashMap, broadcastIp);
-        muteUnmuteMeeting = new MuteUnmuteMeeting(memberHashMap, broadcastIp);
+        joinMeeting = new JoinMeeting(this,  name, isMute, broadcastIp);
+        leaveMeeting = new LeaveMeeting(this,  broadcastIp);
+        muteUnmuteMeeting = new MuteUnmuteMeeting(this, broadcastIp);
 
     }
 
     private void leaveMeeting(){
-
+        leaveMeeting.broadcastLeaveAbsent(Constants.LEAVE_ACTION,name);
         joinMeeting.stopListeningJoinMeeting();
         leaveMeeting.stopListeningLeaveMeeting();
         muteUnmuteMeeting.stopListeningMuteUnmuteMeeting();
+
+    }
+
+    public synchronized void updateMemberHashMap(String action, String nameValue, Boolean isMuteValue){
+
+        switch(action){
+
+            case Constants.JOIN_ACTION:
+            case Constants.PRESENT_ACTION:
+            case Constants.MUTE_ACTION:{
+
+                if (memberHashMap.containsKey(nameValue)) {
+                    Log.i(Constants.MEETING_PAGE_LOG_TAG, "Updating member: " + nameValue);
+                } else {
+                    Log.i(Constants.MEETING_PAGE_LOG_TAG, "Adding member: " + nameValue);
+                }
+                memberHashMap.put(nameValue, isMuteValue);
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        viewAdapter.updateData(memberHashMap);
+
+                    }
+                });
+                Log.i(Constants.MEETING_PAGE_LOG_TAG, "#Members: " + memberHashMap.size());
+                break;
+            }
+
+            case Constants.LEAVE_ACTION:
+            case Constants.ABSENT_ACTION:{
+
+                if(memberHashMap.containsKey(nameValue)) {
+                    Log.i(Constants.MEETING_PAGE_LOG_TAG, "Removing member: " + nameValue);
+                    memberHashMap.remove(nameValue);
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            viewAdapter.updateData(memberHashMap);
+
+                        }
+                    });
+                    Log.i(Constants.MEETING_PAGE_LOG_TAG, "#Members: " + memberHashMap.size());
+                    return;
+                }
+                Log.i(Constants.MEETING_PAGE_LOG_TAG, "Cannot remove member. " + name + " does not exist.");
+                break;
+            }
+
+            default:
+                Log.i(Constants.MEETING_PAGE_LOG_TAG, "Action not found");
+        }
 
     }
 
@@ -123,8 +176,8 @@ public class MeetingPage extends Fragment implements BackPressedListener{
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2, RecyclerView.VERTICAL, false));
-        memberCardRecyclerViewAdapter = new MemberCardRecyclerViewAdapter(memberHashMap);
-        recyclerView.setAdapter(memberCardRecyclerViewAdapter);
+        viewAdapter = new MemberCardRecyclerViewAdapter(memberHashMap);
+        recyclerView.setAdapter(viewAdapter);
         int largePadding = getResources().getDimensionPixelSize(R.dimen.member_grid_spacing_small);
         int smallPadding = getResources().getDimensionPixelSize(R.dimen.member_grid_spacing_small);
         recyclerView.addItemDecoration(new MemberGridItemDecoration(largePadding, smallPadding));

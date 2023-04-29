@@ -2,6 +2,7 @@ package com.example.wifimeeting.usecase.bigclassroomlecturesession;
 
 import android.util.Log;
 
+import com.example.wifimeeting.page.MeetingPage;
 import com.example.wifimeeting.utils.Constants;
 
 import java.io.IOException;
@@ -10,34 +11,19 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.LinkedHashMap;
 
 public class MuteUnmuteMeeting {
 
     private boolean LISTEN_MUTE_MEETING = true;
-    private LinkedHashMap<String, Boolean> members;
+    private MeetingPage uiPage;
     private InetAddress broadcastIP;
 
-    public MuteUnmuteMeeting(LinkedHashMap<String, Boolean> members, InetAddress broadcastIP) {
-        this.members = members;
+    public MuteUnmuteMeeting(MeetingPage uiPage, InetAddress broadcastIP) {
+        this.uiPage = uiPage;
         this.broadcastIP = broadcastIP;
 
         listenMuteUnmuteMeeting();
     }
-
-    /**
-     * Updating members information from the LinkedHashMap
-     */
-    public void muteUnmuteMember(String name, Boolean isMute) {
-        if (members.containsKey(name)) {
-            Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "Updating member: " + name);
-        } else {
-            Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "Adding member: " + name);
-        }
-        members.put(name, isMute);
-        Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "#Members: " + members.size());
-    }
-
 
     /**
      * Broadcast the MUTE action
@@ -127,7 +113,7 @@ public class MuteUnmuteMeeting {
 
                     if (receivedAction.equals(Constants.MUTE_ACTION)) {
                         Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "Mute unmute Meeting Listener received MUTE request");
-                        muteUnmuteMember(receiverName, isMuteValue);
+                        uiPage.updateMemberHashMap(receivedAction, receiverName, isMuteValue);
 
                     } else {
                         Log.w(Constants.MUTE_UNMUTE_LOG_TAG, "Mute unmute Meeting Listener received invalid request: " + receivedAction);

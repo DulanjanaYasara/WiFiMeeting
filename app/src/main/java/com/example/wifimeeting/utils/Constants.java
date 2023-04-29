@@ -34,6 +34,7 @@ public class Constants {
     public static final int BROADCAST_BUF_SIZE = 1024;
 
     //Logging Tags
+    public static final String MEETING_PAGE_LOG_TAG = "MeetingPage";
     public static final String AUDIO_CALL_LOG_TAG = "AudioCall";
     public static final String JOIN_MEETING_LOG_TAG = "JoinMeeting";
     public static final String LEAVE_MEETING_LOG_TAG = "LeaveMeeting";

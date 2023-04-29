@@ -2,6 +2,7 @@ package com.example.wifimeeting.usecase.bigclassroomlecturesession;
 
 import android.util.Log;
 
+import com.example.wifimeeting.page.MeetingPage;
 import com.example.wifimeeting.utils.Constants;
 
 import java.io.IOException;
@@ -10,34 +11,19 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.LinkedHashMap;
 
 public class LeaveMeeting {
 
     private boolean LISTEN_LEAVE_MEETING = true;
-    private LinkedHashMap<String, Boolean> members;
+    private MeetingPage uiPage;
     private InetAddress broadcastIP;
 
-    public LeaveMeeting(LinkedHashMap<String, Boolean> members, InetAddress broadcastIP) {
-        this.members = members;
+    public LeaveMeeting(MeetingPage uiPage, InetAddress broadcastIP) {
+        this.uiPage = uiPage;
         this.broadcastIP = broadcastIP;
 
         listenLeaveMeeting();
     }
-
-    /**
-     * Removing members information from the LinkedHashMap
-     */
-    public void leaveMember(String name) {
-        if(members.containsKey(name)) {
-            Log.i(Constants.LEAVE_MEETING_LOG_TAG, "Removing member: " + name);
-            members.remove(name);
-            Log.i(Constants.LEAVE_MEETING_LOG_TAG, "#Members: " + members.size());
-            return;
-        }
-        Log.i(Constants.LEAVE_MEETING_LOG_TAG, "Cannot remove member. " + name + " does not exist.");
-    }
-
 
     /**
      * Broadcast the LEAVE or ABSENT action
@@ -126,13 +112,12 @@ public class LeaveMeeting {
 
                     if (receivedAction.equals(Constants.LEAVE_ACTION)) {
                         Log.i(Constants.LEAVE_MEETING_LOG_TAG, "Leave Meeting Listener received LEAVE request");
-                        leaveMember(receiverName);
+                        uiPage.updateMemberHashMap(receivedAction, receiverName, true);
                         broadcastLeaveAbsent(Constants.ABSENT_ACTION, receiverName);
                     
                     } else  if (receivedAction.equals(Constants.ABSENT_ACTION)) {
                         Log.i(Constants.LEAVE_MEETING_LOG_TAG, "Leave Meeting Listener received ABSENT request");
-                        leaveMember(receiverName);
-                    
+                        uiPage.updateMemberHashMap(receivedAction, receiverName, true);
                     } else {
                         Log.w(Constants.LEAVE_MEETING_LOG_TAG, "Leave Meeting Listener received invalid request: " + receivedAction);
                     }
