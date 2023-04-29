@@ -24,15 +24,16 @@ public class AudioCall {
     private InetAddress address; // Address to call
     private boolean mic = false; // Enable mic?
     private boolean speakers = false; // Enable speakers?
-    private Role role;
+    private Boolean isMute;
 
-    public AudioCall(InetAddress address, Role role) {
+    public AudioCall(InetAddress address, Boolean isMute) {
+        this.isMute = isMute;
         this.address = address;
     }
 
     public void startCall() {
         Log.i(Constants.AUDIO_CALL_LOG_TAG, "Starting call!");
-        if(role.equals(Role.LECTURER)) startMic();
+        if(!isMute) startMic();
         startSpeakers();
     }
 

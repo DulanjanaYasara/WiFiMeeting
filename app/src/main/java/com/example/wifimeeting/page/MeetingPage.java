@@ -19,6 +19,7 @@ import com.example.wifimeeting.R;
 import com.example.wifimeeting.card.MemberCardRecyclerViewAdapter;
 import com.example.wifimeeting.card.MemberGridItemDecoration;
 import com.example.wifimeeting.navigation.BackPressedListener;
+import com.example.wifimeeting.usecase.bigclassroomlecturesession.AudioCall;
 import com.example.wifimeeting.usecase.bigclassroomlecturesession.JoinMeeting;
 import com.example.wifimeeting.usecase.bigclassroomlecturesession.LeaveMeeting;
 import com.example.wifimeeting.usecase.bigclassroomlecturesession.MuteUnmuteMeeting;
@@ -54,6 +55,7 @@ public class MeetingPage extends Fragment implements BackPressedListener{
     Handler handler = new Handler();
     private InetAddress broadcastIp;
 
+    AudioCall audioCall;
     JoinMeeting joinMeeting;
     LeaveMeeting leaveMeeting;
     MuteUnmuteMeeting muteUnmuteMeeting;
@@ -98,6 +100,7 @@ public class MeetingPage extends Fragment implements BackPressedListener{
 
         // Set up the RecyclerView
         initiateRecyclerView(view);
+        audioCall = new AudioCall(broadcastIp, isMute);
         initializeMeeting();
 
         leaveButton.setOnClickListener(leaveButtonClickEvent());
@@ -107,6 +110,7 @@ public class MeetingPage extends Fragment implements BackPressedListener{
     }
 
     private void initializeMeeting(){
+        audioCall.startCall();
         joinMeeting = new JoinMeeting(this,  name, isMute, broadcastIp);
         leaveMeeting = new LeaveMeeting(this,  broadcastIp);
         muteUnmuteMeeting = new MuteUnmuteMeeting(this, broadcastIp);
@@ -114,6 +118,7 @@ public class MeetingPage extends Fragment implements BackPressedListener{
     }
 
     private void leaveMeeting(){
+        audioCall.endCall();
         leaveMeeting.broadcastLeaveAbsent(Constants.LEAVE_ACTION,name);
         joinMeeting.stopListeningJoinMeeting();
         leaveMeeting.stopListeningLeaveMeeting();
@@ -216,6 +221,11 @@ public class MeetingPage extends Fragment implements BackPressedListener{
                                 getResources().getDrawable(R.drawable.baseline_mic_off_24):
                                 getResources().getDrawable(R.drawable.baseline_mic_24));
                 muteUnmuteMeeting.broadcastMuteUnmute(Constants.MUTE_ACTION,name, isMuteValue);
+
+                if(isMuteValue)
+                    audioCall.muteMeFromMeeting();
+                else
+                    audioCall.unmuteMeFromMeeting();
 
             }
         };
