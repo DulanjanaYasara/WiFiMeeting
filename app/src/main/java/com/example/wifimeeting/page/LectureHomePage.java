@@ -29,7 +29,6 @@ public class LectureHomePage extends Fragment {
     MaterialButton joinLectureButton;
     TextInputLayout portTextInput, lecturerNameTextInput;
     TextInputEditText portEditText, lecturerNameEditText;
-    TextView serverTextView;
 
     @Override
     public View onCreateView(
@@ -42,10 +41,6 @@ public class LectureHomePage extends Fragment {
         portEditText = view.findViewById(R.id.port_edit_text);
         lecturerNameTextInput = view.findViewById(R.id.lecturer_name_text_input);
         lecturerNameEditText = view.findViewById(R.id.lecturer_name_edit_text);
-        serverTextView = view.findViewById(R.id.server_ip_text_view);
-
-        AddressGenerator addressGenerator = new AddressGenerator(view);
-        serverTextView.setText(" "+ addressGenerator.getIpAddress());
         portEditText.setText(Constants.DEFAULT_PORT);
 
         joinLectureButton.setOnClickListener(new View.OnClickListener() {

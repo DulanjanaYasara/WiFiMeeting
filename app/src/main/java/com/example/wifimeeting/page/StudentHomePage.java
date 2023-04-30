@@ -32,7 +32,6 @@ public class StudentHomePage extends Fragment {
     TextInputEditText portEditText;
     TextInputLayout studentNameTextInput;
     TextInputEditText studentNameEditText;
-    TextView serverTextView;
 
     @Override
     public View onCreateView(
@@ -46,10 +45,6 @@ public class StudentHomePage extends Fragment {
         portEditText = view.findViewById(R.id.port_edit_text);
         studentNameTextInput = view.findViewById(R.id.student_name_text_input);
         studentNameEditText = view.findViewById(R.id.student_name_edit_text);
-        serverTextView = view.findViewById(R.id.server_ip);
-
-        AddressGenerator addressGenerator = new AddressGenerator(view);
-        serverTextView.setText(" "+ addressGenerator.getIpAddress());
         portEditText.setText(Constants.DEFAULT_PORT);
 
         smallGroupDiscussionButton.setOnClickListener(new View.OnClickListener() {
