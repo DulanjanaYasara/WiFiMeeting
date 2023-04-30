@@ -8,6 +8,7 @@ import com.example.wifimeeting.utils.Constants;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.SocketTimeoutException;
 
 public class LeaveMeeting {
@@ -74,8 +75,9 @@ public class LeaveMeeting {
 
                 DatagramSocket socket = null;
                 try {
-                    socket = new DatagramSocket(Constants.MARK_ABSENCE_BROADCAST_PORT);
-
+                    socket = new DatagramSocket(null);
+                    socket.setReuseAddress(true);
+                    socket.bind(new InetSocketAddress(Constants.MARK_ABSENCE_BROADCAST_PORT));
                 } catch (Exception e) {
                     Log.e(Constants.LEAVE_MEETING_LOG_TAG, "Exception in listener for leave meeting: " + e);
                     if(socket != null){

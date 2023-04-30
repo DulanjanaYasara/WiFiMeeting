@@ -12,6 +12,7 @@ import com.example.wifimeeting.utils.Constants;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 
 public class AudioCall {
 
@@ -148,7 +149,9 @@ public class AudioCall {
                         track = new AudioTrack(AudioManager.STREAM_MUSIC, Constants.SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, BUF_SIZE, AudioTrack.MODE_STREAM);
                         track.play();
 
-                        socket = new DatagramSocket(Constants.AUDIO_CALL_BROADCAST_PORT);
+                        socket = new DatagramSocket(null);
+                        socket.setReuseAddress(true);
+                        socket.bind(new InetSocketAddress(Constants.AUDIO_CALL_BROADCAST_PORT));
                         byte[] buf = new byte[BUF_SIZE];
 
                         while (speakers) {
