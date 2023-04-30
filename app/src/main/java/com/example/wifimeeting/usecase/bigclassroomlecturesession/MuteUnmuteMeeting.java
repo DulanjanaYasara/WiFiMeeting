@@ -5,11 +5,9 @@ import android.util.Log;
 import com.example.wifimeeting.page.MeetingPage;
 import com.example.wifimeeting.utils.Constants;
 
-import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
 public class MuteUnmuteMeeting {
@@ -35,28 +33,26 @@ public class MuteUnmuteMeeting {
 
             @Override
             public void run() {
+
+                DatagramSocket socket = null;
                 try {
                     String request = action + name + (isMute ? "1" : "0");
                     byte[] message = request.getBytes();
-                    DatagramSocket socket = new DatagramSocket();
+                    socket = new DatagramSocket();
                     socket.setBroadcast(true);
                     DatagramPacket packet = new DatagramPacket(message, message.length, broadcastIP, Constants.MUTE_UNMUTE_BROADCAST_PORT);
                     socket.send(packet);
                     Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "MUTE UNMUTE Action Broadcast packet sent: " + packet.getAddress().toString());
-                    socket.disconnect();
-                    socket.close();
-                } catch (SocketException e) {
 
-                    Log.e(Constants.MUTE_UNMUTE_LOG_TAG, "SocketException in MUTE UNMUTE Action broadcast: " + e);
-                    Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "MUTE UNMUTE Action Broadcaster ending!");
-                } catch (IOException e) {
-
-                    Log.e(Constants.MUTE_UNMUTE_LOG_TAG, "IOException in MUTE UNMUTE Action broadcast: " + e);
-                    Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "MUTE UNMUTE Action Broadcaster ending!");
                 } catch (Exception e) {
-
                     Log.e(Constants.MUTE_UNMUTE_LOG_TAG, "Exception in MUTE UNMUTE Action broadcast: " + e);
                     Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "MUTE UNMUTE Action Broadcaster ending!");
+
+                } finally {
+                    if(socket!=null){
+                        socket.disconnect();
+                        socket.close();
+                    }
                 }
             }
         });
@@ -76,12 +72,16 @@ public class MuteUnmuteMeeting {
             @Override
             public void run() {
 
-                DatagramSocket socket;
+                DatagramSocket socket = null;
                 try {
                     socket = new DatagramSocket(Constants.MUTE_UNMUTE_BROADCAST_PORT);
-                } catch (SocketException e) {
 
-                    Log.e(Constants.MUTE_UNMUTE_LOG_TAG, "SocketException in listener for mute unmute meeting: " + e);
+                } catch (Exception e) {
+                    Log.e(Constants.MUTE_UNMUTE_LOG_TAG, "Exception in listener for mute unmute meeting: " + e);
+                    if(socket!=null){
+                        socket.disconnect();
+                        socket.close();
+                    }
                     return;
                 }
                 byte[] buffer = new byte[Constants.BROADCAST_BUF_SIZE];
@@ -125,14 +125,11 @@ public class MuteUnmuteMeeting {
                     if (LISTEN_MUTE_MEETING) {
                         listen(socket, buffer);
                     }
-                } catch (SocketException e) {
+                    return;
 
-                    Log.e(Constants.MUTE_UNMUTE_LOG_TAG, "SocketException in listen: " + e);
-                    Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "Listener ending!");
-                } catch (IOException e) {
-
-                    Log.e(Constants.MUTE_UNMUTE_LOG_TAG, "IOException in listen: " + e);
-                    Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "Listener ending!");
+                } catch (Exception e) {
+                    Log.e(Constants.MUTE_UNMUTE_LOG_TAG, "Exception in listen: " + e);
+                    return;
                 }
             }
         });

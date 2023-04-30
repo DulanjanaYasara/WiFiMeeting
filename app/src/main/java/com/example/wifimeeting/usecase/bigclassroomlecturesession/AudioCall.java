@@ -8,14 +8,10 @@ import android.media.MediaRecorder;
 import android.util.Log;
 
 import com.example.wifimeeting.utils.Constants;
-import com.example.wifimeeting.utils.Role;
 
-import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 
 public class AudioCall {
 
@@ -93,12 +89,14 @@ public class AudioCall {
                 int bytes_read = 0;
                 int bytes_sent = 0;
                 byte[] buf = new byte[BUF_SIZE];
+                AudioRecord audioRecorder = null;
+                DatagramSocket socket = null;
 
                 try {
-                    AudioRecord audioRecorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, Constants.SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, AudioRecord.getMinBufferSize(Constants.SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT) * 10);
+                    audioRecorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, Constants.SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, AudioRecord.getMinBufferSize(Constants.SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT) * 10);
                     Log.i(Constants.AUDIO_CALL_LOG_TAG, "Packet destination: " + address.toString());
 
-                    DatagramSocket socket = new DatagramSocket();
+                    socket = new DatagramSocket();
                     audioRecorder.startRecording();
 
                     while (mic) {
@@ -110,35 +108,21 @@ public class AudioCall {
                         Thread.sleep(Constants.SAMPLE_INTERVAL, 0);
                     }
 
-                    audioRecorder.stop();
-                    audioRecorder.release();
-                    socket.disconnect();
-                    socket.close();
-                    mic = false;
-                } catch (InterruptedException e) {
-
-                    Log.e(Constants.AUDIO_CALL_LOG_TAG, "InterruptedException: " + e);
-                    mic = false;
-                } catch (SocketException e) {
-
-                    Log.e(Constants.AUDIO_CALL_LOG_TAG, "SocketException: " + e);
-                    mic = false;
-                } catch (UnknownHostException e) {
-
-                    Log.e(Constants.AUDIO_CALL_LOG_TAG, "UnknownHostException: " + e);
-                    mic = false;
-                } catch (IOException e) {
-
-                    Log.e(Constants.AUDIO_CALL_LOG_TAG, "IOException: " + e);
-                    mic = false;
-                } catch (SecurityException e) {
-
-                    Log.e(Constants.AUDIO_CALL_LOG_TAG, "SecurityException: " + e);
                     mic = false;
                 } catch (Exception e) {
-
                     Log.e(Constants.AUDIO_CALL_LOG_TAG, "Exception: " + e);
                     mic = false;
+                } finally {
+
+                    if(audioRecorder !=null){
+                        audioRecorder.stop();
+                        audioRecorder.release();
+                    }
+                    if(socket !=null){
+                        socket.disconnect();
+                        socket.close();
+                    }
+                    return;
                 }
             }
         });
@@ -157,11 +141,14 @@ public class AudioCall {
                 @Override
                 public void run() {
 
+                    AudioTrack track = null;
+                    DatagramSocket socket = null;
+
                     try {
-                        AudioTrack track = new AudioTrack(AudioManager.STREAM_MUSIC, Constants.SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, BUF_SIZE, AudioTrack.MODE_STREAM);
+                        track = new AudioTrack(AudioManager.STREAM_MUSIC, Constants.SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, BUF_SIZE, AudioTrack.MODE_STREAM);
                         track.play();
 
-                        DatagramSocket socket = new DatagramSocket(Constants.AUDIO_CALL_BROADCAST_PORT);
+                        socket = new DatagramSocket(Constants.AUDIO_CALL_BROADCAST_PORT);
                         byte[] buf = new byte[BUF_SIZE];
 
                         while (speakers) {
@@ -174,25 +161,24 @@ public class AudioCall {
                                 track.write(packet.getData(), 0, BUF_SIZE);
                             }
                         }
-
-                        socket.disconnect();
-                        socket.close();
-                        track.stop();
-                        track.flush();
-                        track.release();
                         speakers = false;
-                    } catch (SocketException e) {
 
-                        Log.e(Constants.AUDIO_CALL_LOG_TAG, "SocketException: " + e);
-                        speakers = false;
-                    } catch (IOException e) {
-
-                        Log.e(Constants.AUDIO_CALL_LOG_TAG, "IOException: " + e);
-                        speakers = false;
                     } catch (Exception e) {
-
                         Log.e(Constants.AUDIO_CALL_LOG_TAG, "Exception: " + e);
                         speakers = false;
+
+                    }  finally {
+
+                        if(track !=null){
+                            track.stop();
+                            track.flush();
+                            track.release();
+                        }
+                        if(socket !=null){
+                            socket.disconnect();
+                            socket.close();
+                        }
+                        return;
                     }
                 }
             });
