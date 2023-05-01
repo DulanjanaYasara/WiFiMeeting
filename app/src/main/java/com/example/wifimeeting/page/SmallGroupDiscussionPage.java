@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 
 import androidx.annotation.NonNull;
@@ -12,12 +11,16 @@ import androidx.fragment.app.Fragment;
 
 import com.example.wifimeeting.R;
 import com.example.wifimeeting.navigation.NavigationHost;
+import com.example.wifimeeting.usecase.smallgroupdiscussion.DiscussionGroupItem;
+import com.example.wifimeeting.usecase.smallgroupdiscussion.ListGroupItemAdapter;
 import com.example.wifimeeting.utils.Constants;
 import com.example.wifimeeting.utils.MyDetails;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 public class SmallGroupDiscussionPage extends Fragment {
@@ -37,13 +40,6 @@ public class SmallGroupDiscussionPage extends Fragment {
         View view = inflater.inflate(R.layout.small_group_discussion_page, container, false);
 
         groupListTextView = view.findViewById(R.id.select_group);
-        String groupNameList[] = {"Sneakers", "Fighters", "Bolters", "Lions"};
-        ArrayAdapter arrayAdapterGroupList = new ArrayAdapter(this.getContext(), R.layout.option_group_item, groupNameList);
-
-        //to make default value
-//        groupListTextView.setText(arrayAdapterGroupList.getItem(0).toString(), false);
-        groupListTextView.setAdapter(arrayAdapterGroupList);
-
         joinButton = view.findViewById(R.id.join_button);
         createButton = view.findViewById(R.id.create_button);
         groupNameTextInput = view.findViewById(R.id.group_name_text_input);
@@ -65,6 +61,16 @@ public class SmallGroupDiscussionPage extends Fragment {
         joinButton.setOnClickListener(joinButtonClickEvent());
         createButton.setOnClickListener(createButtonClickEvent());
 
+        // create a arraylist of the type DiscussionGroupItem
+        final ArrayList<DiscussionGroupItem> arrayList = new ArrayList<DiscussionGroupItem>();
+        arrayList.add(new DiscussionGroupItem("Gryffindor", null, "12"));
+        arrayList.add(new DiscussionGroupItem("Hufflepuff", null, "10"));
+        arrayList.add(new DiscussionGroupItem("Ravenclaw", null, "6"));
+        arrayList.add(new DiscussionGroupItem("Slytherin", null, "9"));
+        Collections.sort(arrayList);
+
+        ListGroupItemAdapter listGroupItemAdapter = new ListGroupItemAdapter(this.requireContext(), arrayList);
+        groupListTextView.setAdapter(listGroupItemAdapter);
         return view;
     }
 
