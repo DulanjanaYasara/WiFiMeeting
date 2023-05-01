@@ -1,6 +1,5 @@
 package com.example.wifimeeting.page;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,24 +10,25 @@ import android.widget.AutoCompleteTextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.example.wifimeeting.navigation.NavigationHost;
 import com.example.wifimeeting.R;
+import com.example.wifimeeting.navigation.NavigationHost;
 import com.example.wifimeeting.utils.Constants;
+import com.example.wifimeeting.utils.MyDetails;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Random;
 
 public class SmallGroupDiscussionPage extends Fragment {
 
-    AutoCompleteTextView memberListTextView;
     AutoCompleteTextView groupListTextView;
+    MaterialButton joinButton, createButton;
+    TextInputLayout groupNameTextInput, selectGroupTextInput, multicastGroupTextInput;
+    TextInputEditText groupNameEditText, multicastGroupEditText;
 
-    boolean[] selectedMember;
-
+    private String name = null;
+    private String port = null;
 
     @Override
     public View onCreateView(
@@ -44,69 +44,46 @@ public class SmallGroupDiscussionPage extends Fragment {
 //        groupListTextView.setText(arrayAdapterGroupList.getItem(0).toString(), false);
         groupListTextView.setAdapter(arrayAdapterGroupList);
 
+        joinButton = view.findViewById(R.id.join_button);
+        createButton = view.findViewById(R.id.create_button);
+        groupNameTextInput = view.findViewById(R.id.group_name_text_input);
+        groupNameEditText = view.findViewById(R.id.group_name_edit_text);
+        selectGroupTextInput = view.findViewById(R.id.select_group_text_input);
+        multicastGroupTextInput = view.findViewById(R.id.multicast_group_address_text_input);
+        multicastGroupEditText = view.findViewById(R.id.multicast_group_address_edit_text);
 
-        /**
-         * Material Design Dialog
-         */
-        memberListTextView = view.findViewById(R.id.select_members);
-        String memberArray[] = {"Chamindu", "Dulanjana", "Yasara", "Udesh"};
-        ArrayList<Integer> memberList = new ArrayList<>();
+        if(this.getArguments() != null){
+            Bundle bundle = this.getArguments();
+            name = bundle.getString(MyDetails.NAME.toString());
+            port = bundle.getString(MyDetails.PORT.toString());
 
-        selectedMember = new boolean[memberArray.length];
-        memberListTextView.setOnClickListener(new View.OnClickListener() {
+            groupNameEditText.setText(name + Constants.GROUP_SUFFIX);
+        }
+        multicastGroupEditText.setText(generateMulticastAddress());
+
+        multicastGroupTextInput.setEndIconOnClickListener(multicastGroupRefreshIconClickEvent());
+        joinButton.setOnClickListener(joinButtonClickEvent());
+        createButton.setOnClickListener(createButtonClickEvent());
+
+        return view;
+    }
+
+    private String generateMulticastAddress(){
+        Random rand = new Random();
+        return "239." + rand.nextInt(256) + "." + rand.nextInt(256) + "." + rand.nextInt(256);
+    }
+
+    private View.OnClickListener multicastGroupRefreshIconClickEvent() {
+        return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(view.getContext(), R.style.ThemeOverlay_App_MaterialAlertDialog);
-                builder.setTitle(R.string.select_members);
-                builder.setCancelable(false);
-                builder.setMultiChoiceItems(memberArray, selectedMember, new DialogInterface.OnMultiChoiceClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i, boolean b) {
-                        if (b) {
-                            memberList.add(i);
-                            Collections.sort(memberList);
-                        } else {
-                            memberList.remove(Integer.valueOf(i));
-                        }
-                    }
-                });
-                builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        StringBuilder stringBuilder = new StringBuilder();
-
-                        for (int j = 0; j < memberList.size(); j++) {
-                            stringBuilder.append(memberArray[memberList.get(j)]);
-
-                            if (j != memberList.size() - 1) {
-                                stringBuilder.append(Constants.MEMBERS_SEPARATOR);
-                            }
-                        }
-
-                        memberListTextView.setText(stringBuilder.toString());
-                    }
-                });
-                builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                });
-                builder.show();
+                multicastGroupEditText.setText(generateMulticastAddress());
             }
-        });
+        };
+    }
 
-        MaterialButton joinButton = view.findViewById(R.id.join_button);
-        MaterialButton createButton = view.findViewById(R.id.create_button);
-
-        final TextInputLayout groupNameTextInput = view.findViewById(R.id.group_name_text_input);
-        final TextInputEditText groupNameEditText = view.findViewById(R.id.group_name_edit_text);
-
-        final TextInputLayout selectMembersTextInput = view.findViewById(R.id.select_members_text_input);
-        final TextInputLayout selectGroupTextInput = view.findViewById(R.id.select_group_text_input);
-
-        joinButton.setOnClickListener(new View.OnClickListener() {
+    private View.OnClickListener joinButtonClickEvent() {
+        return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (groupListTextView.getText() == null || groupListTextView.getText().toString().trim().equals("")) {
@@ -116,9 +93,11 @@ public class SmallGroupDiscussionPage extends Fragment {
                     ((NavigationHost) getActivity()).navigateTo(new MeetingPage(), true);
                 }
             }
-        });
+        };
+    }
 
-        createButton.setOnClickListener(new View.OnClickListener() {
+    private View.OnClickListener createButtonClickEvent() {
+        return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (groupNameEditText.getText() == null || groupNameEditText.getText().toString().trim().equals("")) {
@@ -127,21 +106,12 @@ public class SmallGroupDiscussionPage extends Fragment {
                     groupNameTextInput.setError(null);
                 }
 
-                if (memberListTextView.getText() == null || memberListTextView.getText().toString().trim().equals("")) {
-                    selectMembersTextInput.setError(getString(R.string.members_mandatory));
-                } else if (memberListTextView.getText().toString().trim().split(Constants.MEMBERS_SEPARATOR).length > Constants.SMALL_GROUP_DISCUSSION_MEMBER_MAX_COUNT){
-                    selectMembersTextInput.setError(getString(R.string.max_count_exceeded));
-                } else {
-                    selectMembersTextInput.setError(null);
-                }
-
-                if (groupNameTextInput.getError() == null && selectMembersTextInput.getError() == null) {
+                if (groupNameTextInput.getError() == null) {
                     // Navigate to the next Fragment
                     ((NavigationHost) getActivity()).navigateTo(new MeetingPage(), true);
                 }
             }
-        });
-
-        return view;
+        };
     }
+
 }

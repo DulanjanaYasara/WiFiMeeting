@@ -53,8 +53,19 @@ public class StudentHomePage extends Fragment {
 
                 checkValidations();
                 if(portTextInput.getError() == null && studentNameTextInput.getError() == null) {
-                    // Navigate to the next Fragment
-                    ((NavigationHost) getActivity()).navigateTo(new SmallGroupDiscussionPage(), true);
+
+                    if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
+                        Snackbar.make(view, R.string.permission_mandatory, Snackbar.LENGTH_SHORT).show();
+                    else {
+                        Bundle bundle = new Bundle();
+                        bundle.putString(MyDetails.NAME.toString(), Objects.requireNonNull(studentNameEditText.getText()).toString().trim());
+                        bundle.putString(MyDetails.PORT.toString(), Objects.requireNonNull(portEditText.getText()).toString());
+
+                        SmallGroupDiscussionPage discussionPage = new SmallGroupDiscussionPage();
+                        discussionPage.setArguments(bundle);
+                        // Navigate to the next Fragment
+                        ((NavigationHost) getActivity()).navigateTo(discussionPage, true);
+                    }
                 }
 
             }
@@ -71,7 +82,7 @@ public class StudentHomePage extends Fragment {
                         Snackbar.make(view, R.string.permission_mandatory, Snackbar.LENGTH_SHORT).show();
                     else {
                         Bundle bundle = new Bundle();
-                        bundle.putString(MyDetails.NAME.toString(), Objects.requireNonNull(studentNameEditText.getText()).toString());
+                        bundle.putString(MyDetails.NAME.toString(), Objects.requireNonNull(studentNameEditText.getText()).toString().trim());
                         bundle.putBoolean(MyDetails.IS_MUTE.toString(), true);
                         bundle.putString(MyDetails.ROLE.toString(), Role.STUDENT.toString());
 

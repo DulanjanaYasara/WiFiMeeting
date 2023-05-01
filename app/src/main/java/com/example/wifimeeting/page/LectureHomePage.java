@@ -54,7 +54,7 @@ public class LectureHomePage extends Fragment {
                         Snackbar.make(view, R.string.permission_mandatory, Snackbar.LENGTH_SHORT).show();
 				    else {
                         Bundle bundle = new Bundle();
-                        bundle.putString(MyDetails.NAME.toString(), Objects.requireNonNull(lecturerNameEditText.getText()).toString());
+                        bundle.putString(MyDetails.NAME.toString(), Objects.requireNonNull(lecturerNameEditText.getText()).toString().trim());
                         bundle.putBoolean(MyDetails.IS_MUTE.toString(), false);
                         bundle.putString(MyDetails.ROLE.toString(), Role.LECTURER.toString());
 

@@ -45,6 +45,7 @@
     <string name="lecturer_name">Lecturer Name</string>
     <string name="small_group_discussion">Small Group Discussion</string>
     <string name="group_name">Group Name</string>
+    <string name="multicast_group_address">Multicast Group Address</string>
     <string name="or">or</string>
     <string name="member_name">Member Name</string>
 </resources>

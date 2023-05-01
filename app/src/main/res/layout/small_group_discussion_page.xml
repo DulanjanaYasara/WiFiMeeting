@@ -31,22 +31,25 @@
             android:maxLines="1" />
     </com.google.android.material.textfield.TextInputLayout>
 
-
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/select_members_text_input"
-        style="@style/Widget.WifiMeeting.DropDownLayout"
+        android:id="@+id/multicast_group_address_text_input"
+        style="@style/Widget.WifiMeeting.TextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/select_members"
-        app:startIconDrawable="@drawable/baseline_person_add_24">
+        android:hint="@string/multicast_group_address"
 
-        <AutoCompleteTextView
-            android:id="@+id/select_members"
+        app:endIconDrawable="@drawable/baseline_refresh_24"
+        app:endIconMode="custom"
+        app:endIconTint="@color/colorPrimaryDark"
+        app:endIconCheckable="true">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/multicast_group_address_edit_text"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/text_input_height"
-            android:enabled="true"
-            android:inputType="none"
-            android:singleLine="true"/>
+            android:layout_height="wrap_content"
+            android:inputType="number|numberDecimal"
+            android:digits="0123456789."
+            android:maxLines="1" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.button.MaterialButton
