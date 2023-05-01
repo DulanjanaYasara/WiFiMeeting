@@ -1,4 +1,4 @@
-package com.example.wifimeeting.card;
+package com.example.wifimeeting.components.membercard;
 
 import android.annotation.SuppressLint;
 import android.view.LayoutInflater;

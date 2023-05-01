@@ -1,4 +1,4 @@
-package com.example.wifimeeting.card;
+package com.example.wifimeeting.components.membercard;
 
 import android.view.View;
 import android.widget.TextView;

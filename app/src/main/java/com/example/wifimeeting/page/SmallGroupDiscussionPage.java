@@ -11,8 +11,8 @@ import androidx.fragment.app.Fragment;
 
 import com.example.wifimeeting.R;
 import com.example.wifimeeting.navigation.NavigationHost;
-import com.example.wifimeeting.usecase.smallgroupdiscussion.DiscussionGroupItem;
-import com.example.wifimeeting.usecase.smallgroupdiscussion.ListGroupItemAdapter;
+import com.example.wifimeeting.components.groupitem.DiscussionGroupItem;
+import com.example.wifimeeting.components.groupitem.ListGroupItemAdapter;
 import com.example.wifimeeting.utils.Constants;
 import com.example.wifimeeting.utils.MyDetails;
 import com.google.android.material.button.MaterialButton;

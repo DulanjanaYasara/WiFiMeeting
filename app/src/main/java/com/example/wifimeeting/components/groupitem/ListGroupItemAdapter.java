@@ -1,4 +1,4 @@
-package com.example.wifimeeting.usecase.smallgroupdiscussion;
+package com.example.wifimeeting.components.groupitem;
 
 import android.content.Context;
 import android.view.LayoutInflater;

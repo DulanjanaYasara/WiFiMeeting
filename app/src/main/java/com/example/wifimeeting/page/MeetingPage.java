@@ -16,8 +16,8 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wifimeeting.R;
-import com.example.wifimeeting.card.MemberCardRecyclerViewAdapter;
-import com.example.wifimeeting.card.MemberGridItemDecoration;
+import com.example.wifimeeting.components.membercard.MemberCardRecyclerViewAdapter;
+import com.example.wifimeeting.components.membercard.MemberGridItemDecoration;
 import com.example.wifimeeting.navigation.BackPressedListener;
 import com.example.wifimeeting.usecase.bigclassroomlecturesession.AudioCall;
 import com.example.wifimeeting.usecase.bigclassroomlecturesession.JoinMeeting;
