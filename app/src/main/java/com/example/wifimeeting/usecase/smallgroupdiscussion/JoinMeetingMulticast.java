@@ -10,7 +10,7 @@ import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.SocketTimeoutException;
 
-public class JoinMeeting {
+public class JoinMeetingMulticast {
 
     private boolean LISTEN_JOIN_MEETING = true;
     private MeetingPage uiPage;
@@ -18,7 +18,7 @@ public class JoinMeeting {
     private String name;
     private Boolean isMute;
 
-    public JoinMeeting(MeetingPage uiPage, String name, Boolean isMute, InetAddress multicastIP) {
+    public JoinMeetingMulticast(MeetingPage uiPage, String name, Boolean isMute, InetAddress multicastIP) {
         this.uiPage = uiPage;
         this.multicastIP = multicastIP;
         this.name = name;

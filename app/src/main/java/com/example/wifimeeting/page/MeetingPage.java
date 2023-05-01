@@ -19,10 +19,10 @@ import com.example.wifimeeting.R;
 import com.example.wifimeeting.components.membercard.MemberCardRecyclerViewAdapter;
 import com.example.wifimeeting.components.membercard.MemberGridItemDecoration;
 import com.example.wifimeeting.navigation.BackPressedListener;
-import com.example.wifimeeting.usecase.bigclassroomlecturesession.AudioCall;
-import com.example.wifimeeting.usecase.bigclassroomlecturesession.JoinMeeting;
-import com.example.wifimeeting.usecase.bigclassroomlecturesession.LeaveMeeting;
-import com.example.wifimeeting.usecase.bigclassroomlecturesession.MuteUnmuteMeeting;
+import com.example.wifimeeting.usecase.bigclassroomlecturesession.AudioCallBroadcast;
+import com.example.wifimeeting.usecase.bigclassroomlecturesession.JoinMeetingBroadcast;
+import com.example.wifimeeting.usecase.bigclassroomlecturesession.LeaveMeetingBroadcast;
+import com.example.wifimeeting.usecase.bigclassroomlecturesession.MuteUnmuteMeetingBroadcast;
 import com.example.wifimeeting.utils.AddressGenerator;
 import com.example.wifimeeting.utils.Constants;
 import com.example.wifimeeting.utils.MyDetails;
@@ -55,10 +55,10 @@ public class MeetingPage extends Fragment implements BackPressedListener{
     Handler handler = new Handler();
     private InetAddress broadcastIp;
 
-    AudioCall audioCall;
-    JoinMeeting joinMeeting;
-    LeaveMeeting leaveMeeting;
-    MuteUnmuteMeeting muteUnmuteMeeting;
+    AudioCallBroadcast audioCall;
+    JoinMeetingBroadcast joinMeeting;
+    LeaveMeetingBroadcast leaveMeeting;
+    MuteUnmuteMeetingBroadcast muteUnmuteMeeting;
 
     @Override
     public View onCreateView(
@@ -100,7 +100,7 @@ public class MeetingPage extends Fragment implements BackPressedListener{
 
         // Set up the RecyclerView
         initiateRecyclerView(view);
-        audioCall = new AudioCall(addressGenerator.getIpAddress(), broadcastIp, isMute);
+        audioCall = new AudioCallBroadcast(addressGenerator.getIpAddress(), broadcastIp, isMute);
         initializeMeeting();
 
         leaveButton.setOnClickListener(leaveButtonClickEvent());
@@ -111,9 +111,9 @@ public class MeetingPage extends Fragment implements BackPressedListener{
 
     private void initializeMeeting(){
         audioCall.startCall();
-        joinMeeting = new JoinMeeting(this,  name, isMute, broadcastIp);
-        leaveMeeting = new LeaveMeeting(this,  broadcastIp);
-        muteUnmuteMeeting = new MuteUnmuteMeeting(this, broadcastIp);
+        joinMeeting = new JoinMeetingBroadcast(this,  name, isMute, broadcastIp);
+        leaveMeeting = new LeaveMeetingBroadcast(this,  broadcastIp);
+        muteUnmuteMeeting = new MuteUnmuteMeetingBroadcast(this, broadcastIp);
 
     }
 

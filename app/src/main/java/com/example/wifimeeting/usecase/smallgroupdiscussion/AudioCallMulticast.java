@@ -15,7 +15,7 @@ import java.net.MulticastSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
-public class AudioCall {
+public class AudioCallMulticast {
 
     //Calculating the buffer size for an Android audio track (in bytes)
     private static final int BUF_SIZE = Constants.SAMPLE_INTERVAL * Constants.SAMPLE_INTERVAL * Constants.SAMPLE_SIZE * 2;
@@ -25,7 +25,7 @@ public class AudioCall {
     private boolean speakers = false; // Enable speakers?
     private Boolean isMute;
 
-    public AudioCall(InetAddress myAddress, InetAddress multicastIP, Boolean isMute) {
+    public AudioCallMulticast(InetAddress myAddress, InetAddress multicastIP, Boolean isMute) {
         this.myAddress = myAddress;
         this.isMute = isMute;
         this.multicastIP = multicastIP;

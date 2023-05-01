@@ -12,13 +12,13 @@ import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.SocketTimeoutException;
 
-public class EndMeeting {
+public class EndMeetingMulticast {
 
     private boolean LISTEN_END_MEETING = true;
     private InetAddress multicastIP;
     private MeetingPage uiPage;
 
-    public EndMeeting(MeetingPage uiPage, InetAddress multicastIP) {
+    public EndMeetingMulticast(MeetingPage uiPage, InetAddress multicastIP) {
         this.uiPage = uiPage;
         this.multicastIP = multicastIP;
 

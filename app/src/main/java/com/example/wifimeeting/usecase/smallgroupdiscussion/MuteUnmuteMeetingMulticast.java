@@ -12,25 +12,25 @@ import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.SocketTimeoutException;
 
-public class LeaveMeeting {
+public class MuteUnmuteMeetingMulticast {
 
-    private boolean LISTEN_LEAVE_MEETING = true;
+    private boolean LISTEN_MUTE_MEETING = true;
     private MeetingPage uiPage;
     private InetAddress multicastIP;
 
-    public LeaveMeeting(MeetingPage uiPage, InetAddress multicastIP) {
+    public MuteUnmuteMeetingMulticast(MeetingPage uiPage, InetAddress multicastIP) {
         this.uiPage = uiPage;
         this.multicastIP = multicastIP;
 
-        listenLeaveMeeting();
+        listenMuteUnmuteMeeting();
     }
 
     /**
-     * Multicast the LEAVE or ABSENT action
+     * Multicast the MUTE action
      */
-    public void multicastLeaveAbsent(String action, final String name) {
+    public void multicastMuteUnmute(String action, final String name, final Boolean isMute) {
 
-        Log.i(Constants.LEAVE_MEETING_LOG_TAG, "Multicasting LEAVE ABSENT Action started!");
+        Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "Multicasting MUTE UNMUTE Action started!");
         Thread multicastThread = new Thread(new Runnable() {
 
             @Override
@@ -38,20 +38,20 @@ public class LeaveMeeting {
 
                 MulticastSocket socket = null;
                 try {
-                    String request = action + name;
+                    String request = action + name + (isMute ? "1" : "0");
                     byte[] message = request.getBytes();
                     socket = new MulticastSocket();
 
-                    DatagramPacket packet = new DatagramPacket(message, message.length, multicastIP, Constants.MARK_ABSENCE_MULTICAST_PORT);
+                    DatagramPacket packet = new DatagramPacket(message, message.length, multicastIP, Constants.MUTE_UNMUTE_MULTICAST_PORT);
                     socket.send(packet);
-                    Log.i(Constants.LEAVE_MEETING_LOG_TAG, "LEAVE ABSENT Action Multicast packet sent: " + packet.getAddress().toString());
+                    Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "MUTE UNMUTE Action Multicast packet sent: " + packet.getAddress().toString());
 
                 } catch (Exception e) {
-                    Log.e(Constants.LEAVE_MEETING_LOG_TAG, "Exception in LEAVE ABSENT Action multicast: " + e);
-                    Log.i(Constants.LEAVE_MEETING_LOG_TAG, "LEAVE ABSENT Action Multicasting ending!");
+                    Log.e(Constants.MUTE_UNMUTE_LOG_TAG, "Exception in MUTE UNMUTE Action multicast: " + e);
+                    Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "MUTE UNMUTE Action Multicasting ending!");
 
                 } finally {
-                    if(socket != null){
+                    if(socket!=null){
                         socket.disconnect();
                         socket.close();
                     }
@@ -63,11 +63,11 @@ public class LeaveMeeting {
 
 
     /**
-     * Listening thread for leave meeting
+     * Listening thread for mute-unmute meeting
      */
-    public void listenLeaveMeeting() {
+    public void listenMuteUnmuteMeeting() {
 
-        Log.i(Constants.LEAVE_MEETING_LOG_TAG, "Listening started for leave meeting!");
+        Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "Listening started for mute unmute meeting!");
 
         Thread listenThread = new Thread(new Runnable() {
 
@@ -78,22 +78,21 @@ public class LeaveMeeting {
                 try {
                     socket = new MulticastSocket(null);
                     socket.setReuseAddress(true);
-                    socket.bind(new InetSocketAddress(Constants.MARK_ABSENCE_MULTICAST_PORT));
+                    socket.bind(new InetSocketAddress(Constants.MUTE_UNMUTE_MULTICAST_PORT));
                     socket.joinGroup(multicastIP);
 
-
                     byte[] buffer = new byte[Constants.MULTICAST_BUF_SIZE];
-                    while (LISTEN_LEAVE_MEETING) {
+                    while (LISTEN_MUTE_MEETING) {
                         listen(socket, buffer);
                     }
 
-                    Log.i(Constants.LEAVE_MEETING_LOG_TAG, "Listener for leave meeting ending!");
+                    Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "Listener for mute unmute meeting ending!");
                     socket.leaveGroup(multicastIP);
                     socket.disconnect();
                     socket.close();
                 } catch (Exception e) {
-                    Log.e(Constants.LEAVE_MEETING_LOG_TAG, "Exception in listener for leave meeting: " + e);
-                    if(socket != null){
+                    Log.e(Constants.MUTE_UNMUTE_LOG_TAG, "Exception in listener for mute unmute meeting: " + e);
+                    if(socket!=null){
                         try {
                             socket.leaveGroup(multicastIP);
                         } catch (IOException ex) {
@@ -111,39 +110,36 @@ public class LeaveMeeting {
 
                 try {
 
-                    Log.i(Constants.LEAVE_MEETING_LOG_TAG, "Listening for a leave meeting packet!");
+                    Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "Listening for a mute unmute meeting packet!");
 
                     DatagramPacket packet = new DatagramPacket(buffer, Constants.MULTICAST_BUF_SIZE);
                     socket.setSoTimeout(15000);
                     socket.receive(packet);
                     String data = new String(buffer, 0, packet.getLength());
-                    Log.i(Constants.LEAVE_MEETING_LOG_TAG, "Packet received: " + data);
+                    Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "Packet received: " + data);
 
                     String receivedAction = data.substring(0, 2);
-                    String receiverName = data.substring(2);
+                    String receiverName = data.substring(2, data.length() - 1);
+                    Boolean isMuteValue = data.endsWith("1");
 
-                    if (receivedAction.equals(Constants.LEAVE_ACTION)) {
-                        Log.i(Constants.LEAVE_MEETING_LOG_TAG, "Leave Meeting Listener received LEAVE request");
-                        uiPage.updateMemberHashMap(receivedAction, receiverName, true);
-                        multicastLeaveAbsent(Constants.ABSENT_ACTION, receiverName);
-                    
-                    } else  if (receivedAction.equals(Constants.ABSENT_ACTION)) {
-                        Log.i(Constants.LEAVE_MEETING_LOG_TAG, "Leave Meeting Listener received ABSENT request");
-                        uiPage.updateMemberHashMap(receivedAction, receiverName, true);
+                    if (receivedAction.equals(Constants.MUTE_ACTION)) {
+                        Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "Mute unmute Meeting Listener received MUTE request");
+                        uiPage.updateMemberHashMap(receivedAction, receiverName, isMuteValue);
+
                     } else {
-                        Log.w(Constants.LEAVE_MEETING_LOG_TAG, "Leave Meeting Listener received invalid request: " + receivedAction);
+                        Log.w(Constants.MUTE_UNMUTE_LOG_TAG, "Mute unmute Meeting Listener received invalid request: " + receivedAction);
                     }
 
                 } catch (SocketTimeoutException e) {
 
-                    Log.i(Constants.LEAVE_MEETING_LOG_TAG, "No packet received!");
-                    if (LISTEN_LEAVE_MEETING) {
+                    Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "No packet received!");
+                    if (LISTEN_MUTE_MEETING) {
                         listen(socket, buffer);
                     }
                     return;
 
                 } catch (Exception e) {
-                    Log.e(Constants.LEAVE_MEETING_LOG_TAG, "Exception in listen: " + e);
+                    Log.e(Constants.MUTE_UNMUTE_LOG_TAG, "Exception in listen: " + e);
                     return;
                 }
             }
@@ -151,7 +147,7 @@ public class LeaveMeeting {
         listenThread.start();
     }
 
-    public void stopListeningLeaveMeeting() {
-        LISTEN_LEAVE_MEETING = false;
+    public void stopListeningMuteUnmuteMeeting() {
+        LISTEN_MUTE_MEETING = false;
     }
 }

@@ -13,13 +13,13 @@ import java.net.SocketTimeoutException;
 import java.util.Arrays;
 import java.util.List;
 
-public class CreateMeeting {
+public class CreateMeetingBroadcast {
 
     private boolean LISTEN_CREATE_MEETING = true;
     private SmallGroupDiscussionPage uiPage;
     private InetAddress broadcastIP;
 
-    public CreateMeeting(SmallGroupDiscussionPage uiPage, InetAddress broadcastIP) {
+    public CreateMeetingBroadcast(SmallGroupDiscussionPage uiPage, InetAddress broadcastIP) {
         this.uiPage = uiPage;
         this.broadcastIP = broadcastIP;
 

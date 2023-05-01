@@ -11,13 +11,13 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketTimeoutException;
 
-public class LeaveMeeting {
+public class LeaveMeetingBroadcast {
 
     private boolean LISTEN_LEAVE_MEETING = true;
     private MeetingPage uiPage;
     private InetAddress broadcastIP;
 
-    public LeaveMeeting(MeetingPage uiPage, InetAddress broadcastIP) {
+    public LeaveMeetingBroadcast(MeetingPage uiPage, InetAddress broadcastIP) {
         this.uiPage = uiPage;
         this.broadcastIP = broadcastIP;
 

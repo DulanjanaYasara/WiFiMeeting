@@ -1,54 +1,53 @@
-package com.example.wifimeeting.usecase.smallgroupdiscussion;
+package com.example.wifimeeting.usecase.bigclassroomlecturesession;
 
 import android.util.Log;
 
 import com.example.wifimeeting.page.MeetingPage;
 import com.example.wifimeeting.utils.Constants;
 
-import java.io.IOException;
 import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.MulticastSocket;
 import java.net.SocketTimeoutException;
 
-public class MuteUnmuteMeeting {
+public class MuteUnmuteMeetingBroadcast {
 
     private boolean LISTEN_MUTE_MEETING = true;
     private MeetingPage uiPage;
-    private InetAddress multicastIP;
+    private InetAddress broadcastIP;
 
-    public MuteUnmuteMeeting(MeetingPage uiPage, InetAddress multicastIP) {
+    public MuteUnmuteMeetingBroadcast(MeetingPage uiPage, InetAddress broadcastIP) {
         this.uiPage = uiPage;
-        this.multicastIP = multicastIP;
+        this.broadcastIP = broadcastIP;
 
         listenMuteUnmuteMeeting();
     }
 
     /**
-     * Multicast the MUTE action
+     * Broadcast the MUTE action
      */
-    public void multicastMuteUnmute(String action, final String name, final Boolean isMute) {
+    public void broadcastMuteUnmute(String action, final String name,final Boolean isMute) {
 
-        Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "Multicasting MUTE UNMUTE Action started!");
-        Thread multicastThread = new Thread(new Runnable() {
+        Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "Broadcasting MUTE UNMUTE Action started!");
+        Thread broadcastThread = new Thread(new Runnable() {
 
             @Override
             public void run() {
 
-                MulticastSocket socket = null;
+                DatagramSocket socket = null;
                 try {
                     String request = action + name + (isMute ? "1" : "0");
                     byte[] message = request.getBytes();
-                    socket = new MulticastSocket();
-
-                    DatagramPacket packet = new DatagramPacket(message, message.length, multicastIP, Constants.MUTE_UNMUTE_MULTICAST_PORT);
+                    socket = new DatagramSocket();
+                    socket.setBroadcast(true);
+                    DatagramPacket packet = new DatagramPacket(message, message.length, broadcastIP, Constants.MUTE_UNMUTE_BROADCAST_PORT);
                     socket.send(packet);
-                    Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "MUTE UNMUTE Action Multicast packet sent: " + packet.getAddress().toString());
+                    Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "MUTE UNMUTE Action Broadcast packet sent: " + packet.getAddress().toString());
 
                 } catch (Exception e) {
-                    Log.e(Constants.MUTE_UNMUTE_LOG_TAG, "Exception in MUTE UNMUTE Action multicast: " + e);
-                    Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "MUTE UNMUTE Action Multicasting ending!");
+                    Log.e(Constants.MUTE_UNMUTE_LOG_TAG, "Exception in MUTE UNMUTE Action broadcast: " + e);
+                    Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "MUTE UNMUTE Action Broadcaster ending!");
 
                 } finally {
                     if(socket!=null){
@@ -58,7 +57,7 @@ public class MuteUnmuteMeeting {
                 }
             }
         });
-        multicastThread.start();
+        broadcastThread.start();
     }
 
 
@@ -74,45 +73,37 @@ public class MuteUnmuteMeeting {
             @Override
             public void run() {
 
-                MulticastSocket socket = null;
+                DatagramSocket socket = null;
                 try {
-                    socket = new MulticastSocket(null);
+                    socket = new DatagramSocket(null);
                     socket.setReuseAddress(true);
-                    socket.bind(new InetSocketAddress(Constants.MUTE_UNMUTE_MULTICAST_PORT));
-                    socket.joinGroup(multicastIP);
-
-                    byte[] buffer = new byte[Constants.MULTICAST_BUF_SIZE];
-                    while (LISTEN_MUTE_MEETING) {
-                        listen(socket, buffer);
-                    }
-
-                    Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "Listener for mute unmute meeting ending!");
-                    socket.leaveGroup(multicastIP);
-                    socket.disconnect();
-                    socket.close();
+                    socket.bind(new InetSocketAddress(Constants.MUTE_UNMUTE_BROADCAST_PORT));
                 } catch (Exception e) {
                     Log.e(Constants.MUTE_UNMUTE_LOG_TAG, "Exception in listener for mute unmute meeting: " + e);
                     if(socket!=null){
-                        try {
-                            socket.leaveGroup(multicastIP);
-                        } catch (IOException ex) {
-                            Log.e(Constants.JOIN_MEETING_LOG_TAG, "Exception in listener for leaving the multicast group: " + e);
-                        }
                         socket.disconnect();
                         socket.close();
                     }
                     return;
                 }
+                byte[] buffer = new byte[Constants.BROADCAST_BUF_SIZE];
+                while (LISTEN_MUTE_MEETING) {
+                    listen(socket, buffer);
+                }
+
+                Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "Listener for mute unmute meeting ending!");
+                socket.disconnect();
+                socket.close();
             }
 
             //Listen in for new notifications
-            public void listen(MulticastSocket socket, byte[] buffer) {
+            public void listen(DatagramSocket socket, byte[] buffer) {
 
                 try {
 
                     Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "Listening for a mute unmute meeting packet!");
 
-                    DatagramPacket packet = new DatagramPacket(buffer, Constants.MULTICAST_BUF_SIZE);
+                    DatagramPacket packet = new DatagramPacket(buffer, Constants.BROADCAST_BUF_SIZE);
                     socket.setSoTimeout(15000);
                     socket.receive(packet);
                     String data = new String(buffer, 0, packet.getLength());

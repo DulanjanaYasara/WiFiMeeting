@@ -14,7 +14,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
-public class AudioCall {
+public class AudioCallBroadcast {
 
     //Calculating the buffer size for an Android audio track (in bytes)
     private static final int BUF_SIZE = Constants.SAMPLE_INTERVAL * Constants.SAMPLE_INTERVAL * Constants.SAMPLE_SIZE * 2;
@@ -24,7 +24,7 @@ public class AudioCall {
     private boolean speakers = false; // Enable speakers?
     private Boolean isMute;
 
-    public AudioCall(InetAddress myAddress, InetAddress address, Boolean isMute) {
+    public AudioCallBroadcast(InetAddress myAddress, InetAddress address, Boolean isMute) {
         this.myAddress = myAddress;
         this.isMute = isMute;
         this.address = address;
