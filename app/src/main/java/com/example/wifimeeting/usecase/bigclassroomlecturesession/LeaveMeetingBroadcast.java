@@ -2,7 +2,7 @@ package com.example.wifimeeting.usecase.bigclassroomlecturesession;
 
 import android.util.Log;
 
-import com.example.wifimeeting.page.MeetingPage;
+import com.example.wifimeeting.page.LectureSessionPage;
 import com.example.wifimeeting.utils.Constants;
 
 import java.net.DatagramPacket;
@@ -14,10 +14,10 @@ import java.net.SocketTimeoutException;
 public class LeaveMeetingBroadcast {
 
     private boolean LISTEN_LEAVE_MEETING = true;
-    private MeetingPage uiPage;
+    private LectureSessionPage uiPage;
     private InetAddress broadcastIP;
 
-    public LeaveMeetingBroadcast(MeetingPage uiPage, InetAddress broadcastIP) {
+    public LeaveMeetingBroadcast(LectureSessionPage uiPage, InetAddress broadcastIP) {
         this.uiPage = uiPage;
         this.broadcastIP = broadcastIP;
 

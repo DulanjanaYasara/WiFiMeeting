@@ -1,7 +1,7 @@
 package com.example.wifimeeting.usecase.smallgroupdiscussion;
 
 import android.util.Log;
-import com.example.wifimeeting.page.MeetingPage;
+import com.example.wifimeeting.page.LectureSessionPage;
 import com.example.wifimeeting.utils.Constants;
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -13,12 +13,12 @@ import java.net.SocketTimeoutException;
 public class JoinMeetingMulticast {
 
     private boolean LISTEN_JOIN_MEETING = true;
-    private MeetingPage uiPage;
+    private LectureSessionPage uiPage;
     private InetAddress multicastIP;
     private String name;
     private Boolean isMute;
 
-    public JoinMeetingMulticast(MeetingPage uiPage, String name, Boolean isMute, InetAddress multicastIP) {
+    public JoinMeetingMulticast(LectureSessionPage uiPage, String name, Boolean isMute, InetAddress multicastIP) {
         this.uiPage = uiPage;
         this.multicastIP = multicastIP;
         this.name = name;

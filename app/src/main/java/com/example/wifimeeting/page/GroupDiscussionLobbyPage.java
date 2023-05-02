@@ -192,7 +192,7 @@ public class GroupDiscussionLobbyPage extends Fragment {
                     selectGroupTextInput.setError(getString(R.string.group_mandatory));
                 } else {
                     selectGroupTextInput.setError(null);
-                    ((NavigationHost) getActivity()).navigateTo(new MeetingPage(), true);
+                    ((NavigationHost) getActivity()).navigateTo(new LectureSessionPage(), true);
                 }
             }
         };
@@ -210,7 +210,7 @@ public class GroupDiscussionLobbyPage extends Fragment {
 
                 if (groupNameTextInput.getError() == null) {
                     // Navigate to the next Fragment
-                    ((NavigationHost) getActivity()).navigateTo(new MeetingPage(), true);
+                    ((NavigationHost) getActivity()).navigateTo(new LectureSessionPage(), true);
                 }
             }
         };

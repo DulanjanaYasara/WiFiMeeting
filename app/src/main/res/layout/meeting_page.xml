@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
         android:layout_above="@+id/border"
-        tools:context=".page.MeetingPage">
+        tools:context=".page.LectureSessionPage">
 
         <androidx.core.widget.NestedScrollView
             android:id="@+id/member_grid"

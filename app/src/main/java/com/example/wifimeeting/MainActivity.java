@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.wifimeeting.navigation.NavigationHost;
-import com.example.wifimeeting.page.MeetingPage;
+import com.example.wifimeeting.page.LectureSessionPage;
 import com.example.wifimeeting.page.StartupPage;
 import com.example.wifimeeting.utils.Constants;
 
@@ -62,8 +62,8 @@ public class MainActivity extends AppCompatActivity implements NavigationHost {
     @Override
     public void onBackPressed() {
 
-        if(MeetingPage.backPressedListener!=null){
-            MeetingPage.backPressedListener.onBackPressed();
+        if(LectureSessionPage.backPressedListener!=null){
+            LectureSessionPage.backPressedListener.onBackPressed();
         } else
             super.onBackPressed();
     }

@@ -2,7 +2,7 @@ package com.example.wifimeeting.usecase.smallgroupdiscussion;
 
 import android.util.Log;
 
-import com.example.wifimeeting.page.MeetingPage;
+import com.example.wifimeeting.page.LectureSessionPage;
 import com.example.wifimeeting.utils.Constants;
 
 import java.io.IOException;
@@ -16,9 +16,9 @@ public class EndMeetingMulticast {
 
     private boolean LISTEN_END_MEETING = true;
     private InetAddress multicastIP;
-    private MeetingPage uiPage;
+    private LectureSessionPage uiPage;
 
-    public EndMeetingMulticast(MeetingPage uiPage, InetAddress multicastIP) {
+    public EndMeetingMulticast(LectureSessionPage uiPage, InetAddress multicastIP) {
         this.uiPage = uiPage;
         this.multicastIP = multicastIP;
 

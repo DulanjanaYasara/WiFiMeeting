@@ -84,10 +84,10 @@ public class StudentHomePage extends Fragment {
                         bundle.putBoolean(MyDetails.IS_MUTE.toString(), true);
                         bundle.putString(MyDetails.ROLE.toString(), Role.STUDENT.toString());
 
-                        MeetingPage meetingPage = new MeetingPage();
-                        meetingPage.setArguments(bundle);
+                        LectureSessionPage lectureSessionPage = new LectureSessionPage();
+                        lectureSessionPage.setArguments(bundle);
                         // Navigate to the next Fragment
-                        ((NavigationHost) getActivity()).navigateTo(meetingPage, true);
+                        ((NavigationHost) getActivity()).navigateTo(lectureSessionPage, true);
                     }
                 }
 
