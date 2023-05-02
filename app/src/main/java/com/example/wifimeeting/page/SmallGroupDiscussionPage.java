@@ -15,6 +15,8 @@ import com.example.wifimeeting.R;
 import com.example.wifimeeting.components.groupitem.DiscussionGroupItem;
 import com.example.wifimeeting.components.groupitem.ListGroupItemAdapter;
 import com.example.wifimeeting.navigation.NavigationHost;
+import com.example.wifimeeting.usecase.smallgroupdiscussion.CreateMeetingBroadcast;
+import com.example.wifimeeting.utils.AddressGenerator;
 import com.example.wifimeeting.utils.Constants;
 import com.example.wifimeeting.utils.MyDetails;
 import com.google.android.material.button.MaterialButton;
@@ -35,8 +37,11 @@ public class SmallGroupDiscussionPage extends Fragment {
     Handler handler = new Handler();
     private String name = null;
     private String port = null;
+    private InetAddress broadcastIp;
+
     private ArrayList<DiscussionGroupItem> groupDiscussionDetails = new ArrayList<DiscussionGroupItem>();
     ListGroupItemAdapter listGroupItemAdapter;
+    CreateMeetingBroadcast createMeetingBroadcast;
 
     @Override
     public View onCreateView(
@@ -66,11 +71,20 @@ public class SmallGroupDiscussionPage extends Fragment {
         joinButton.setOnClickListener(joinButtonClickEvent());
         createButton.setOnClickListener(createButtonClickEvent());
 
+        AddressGenerator addressGenerator = new AddressGenerator(view);
+        broadcastIp = addressGenerator.getBroadcastIp();
+
+        initializeGroupDiscussion();
+
         //GroupDiscussionDetails information update
         Thread discussionDetailsUpdateThread = new Thread(new GroupDiscussionDetailsUpdate());
         discussionDetailsUpdateThread.start();
 
         return view;
+    }
+
+    private void initializeGroupDiscussion(){
+        createMeetingBroadcast = new CreateMeetingBroadcast(this, broadcastIp);
     }
 
     private class GroupDiscussionDetailsUpdate implements Runnable{
@@ -101,6 +115,10 @@ public class SmallGroupDiscussionPage extends Fragment {
                             }
                         });
                     }
+
+                    //stop the 'create meeting broadcast' if the discussion group has maximum number of members
+                    if(createMeetingBroadcast!=null && groupDiscussionDetails.size() > Constants.SMALL_GROUP_DISCUSSION_MEMBER_MAX_COUNT)
+                        createMeetingBroadcast.stopBroadcasting();
 
                     Thread.sleep(Constants.GROUP_DISCUSSION_HEARTBEAT_INTERVAL);
 

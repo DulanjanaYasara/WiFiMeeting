@@ -12,6 +12,8 @@ public class Constants {
 
     public static final int GROUP_DISCUSSION_DISCOVERY_TIMEOUT_MILLISECONDS = 15000;
     public static final int REQUEST_AUDIO_PERMISSION_CODE = 1;
+    public static final int CREATE_MEETING_BROADCAST_INTERVAL = 10000;
+
 
     //    Lecturer Credentials
     public static final String SEC_USERNAME = "chami";

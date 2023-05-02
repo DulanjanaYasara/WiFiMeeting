@@ -16,6 +16,7 @@ import java.util.List;
 public class CreateMeetingBroadcast {
 
     private boolean LISTEN_CREATE_MEETING = true;
+    private boolean BROADCAST = true;
     private SmallGroupDiscussionPage uiPage;
     private InetAddress broadcastIP;
 
@@ -44,8 +45,13 @@ public class CreateMeetingBroadcast {
                     socket = new DatagramSocket();
                     socket.setBroadcast(true);
                     DatagramPacket packet = new DatagramPacket(message, message.length, broadcastIP, Constants.MARK_CREATE_BROADCAST_PORT);
-                    socket.send(packet);
-                    Log.i(Constants.CREATE_MEETING_LOG_TAG, "CREATE Action Broadcast packet sent: " + packet.getAddress().toString());
+
+                    while(BROADCAST) {
+                        socket.send(packet);
+                        Log.i(Constants.CREATE_MEETING_LOG_TAG, "CREATE Action Broadcast packet sent: " + packet.getAddress().toString());
+                        Thread.sleep(Constants.CREATE_MEETING_BROADCAST_INTERVAL);
+                    }
+                    Log.i(Constants.CREATE_MEETING_LOG_TAG, "CREATE Action Broadcast ending!");
 
                 } catch (Exception e) {
                     Log.e(Constants.CREATE_MEETING_LOG_TAG, "Exception in CREATE Action broadcast: " + e);
@@ -60,6 +66,11 @@ public class CreateMeetingBroadcast {
             }
         });
         broadcastThread.start();
+    }
+
+    public void stopBroadcasting() {
+        // Ends the broadcasting thread
+        BROADCAST = false;
     }
 
     /**
