@@ -2,7 +2,7 @@ package com.example.wifimeeting.usecase.smallgroupdiscussion;
 
 import android.util.Log;
 
-import com.example.wifimeeting.page.SmallGroupDiscussionPage;
+import com.example.wifimeeting.page.GroupDiscussionLobbyPage;
 import com.example.wifimeeting.utils.Constants;
 
 import java.net.DatagramPacket;
@@ -17,10 +17,10 @@ public class CreateMeetingBroadcast {
 
     private boolean LISTEN_CREATE_MEETING = true;
     private boolean BROADCAST = true;
-    private SmallGroupDiscussionPage uiPage;
+    private GroupDiscussionLobbyPage uiPage;
     private InetAddress broadcastIP;
 
-    public CreateMeetingBroadcast(SmallGroupDiscussionPage uiPage, InetAddress broadcastIP) {
+    public CreateMeetingBroadcast(GroupDiscussionLobbyPage uiPage, InetAddress broadcastIP) {
         this.uiPage = uiPage;
         this.broadcastIP = broadcastIP;
 

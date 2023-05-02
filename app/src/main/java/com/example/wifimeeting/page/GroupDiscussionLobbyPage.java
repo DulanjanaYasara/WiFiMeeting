@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class SmallGroupDiscussionPage extends Fragment {
+public class GroupDiscussionLobbyPage extends Fragment {
 
     AutoCompleteTextView groupListTextView;
     MaterialButton joinButton, createButton;
@@ -47,7 +47,7 @@ public class SmallGroupDiscussionPage extends Fragment {
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.small_group_discussion_page, container, false);
+        View view = inflater.inflate(R.layout.group_discussion_lobby_page, container, false);
 
         joinButton = view.findViewById(R.id.join_button);
         createButton = view.findViewById(R.id.create_button);

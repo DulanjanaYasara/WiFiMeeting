@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -13,7 +12,6 @@ import androidx.fragment.app.Fragment;
 
 import com.example.wifimeeting.R;
 import com.example.wifimeeting.navigation.NavigationHost;
-import com.example.wifimeeting.utils.AddressGenerator;
 import com.example.wifimeeting.utils.Constants;
 import com.example.wifimeeting.utils.MyDetails;
 import com.example.wifimeeting.utils.Role;
@@ -61,7 +59,7 @@ public class StudentHomePage extends Fragment {
                         bundle.putString(MyDetails.NAME.toString(), Objects.requireNonNull(studentNameEditText.getText()).toString().trim());
                         bundle.putString(MyDetails.PORT.toString(), Objects.requireNonNull(portEditText.getText()).toString());
 
-                        SmallGroupDiscussionPage discussionPage = new SmallGroupDiscussionPage();
+                        GroupDiscussionLobbyPage discussionPage = new GroupDiscussionLobbyPage();
                         discussionPage.setArguments(bundle);
                         // Navigate to the next Fragment
                         ((NavigationHost) getActivity()).navigateTo(discussionPage, true);
