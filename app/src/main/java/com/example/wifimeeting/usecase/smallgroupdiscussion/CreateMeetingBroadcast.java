@@ -120,8 +120,7 @@ public class CreateMeetingBroadcast {
                     if (receivedAction.equals(Constants.CREATE_ACTION)) {
                         Log.i(Constants.CREATE_MEETING_LOG_TAG, "Create Meeting Listener received CREATE request");
 
-                        //TODO:
-//                        uiPage.updateDiscusionGroupItemList(groupName, multicastIpAddress, noOfMembers);
+                        uiPage.updateGroupDiscussionDetails(groupName, multicastIpAddress, noOfMembers);
 
                     } else {
                         Log.w(Constants.CREATE_MEETING_LOG_TAG, "Create Meeting Listener received invalid request: " + receivedAction);

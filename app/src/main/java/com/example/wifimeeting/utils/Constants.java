@@ -8,6 +8,9 @@ public class Constants {
     public static final String STRING_SEPARATOR = "#";
     public static final int PASSWORD_MAX_LENGTH = 12;
     public static final int MUTE_UNMUTE_BUTTON_THRESHOLD_MILLISECONDS = 3000;
+    public static final int GROUP_DISCUSSION_HEARTBEAT_INTERVAL = 5000; // 5 seconds
+
+    public static final int GROUP_DISCUSSION_DISCOVERY_TIMEOUT_MILLISECONDS = 15000;
     public static final int REQUEST_AUDIO_PERMISSION_CODE = 1;
 
     //    Lecturer Credentials
@@ -52,5 +55,7 @@ public class Constants {
     public static final String MUTE_UNMUTE_LOG_TAG = "MuteUnmute";
     public static final String CREATE_MEETING_LOG_TAG = "CreateMeeting";
     public static final String END_MEETING_LOG_TAG = "EndMeeting";
+    public static final String SMALL_GROUP_DISCUSSION_PAGE_LOG_TAG = "SmallGroupDiscussionPage";
+
 
 }

@@ -1,17 +1,20 @@
 package com.example.wifimeeting.components.groupitem;
 
 import java.net.InetAddress;
+import java.util.Objects;
 
 public class DiscussionGroupItem implements Comparable<DiscussionGroupItem>{
 
     private String groupName;
     private InetAddress multicastGroupAddress;
     private String noOfMembers;
+    private Long heartBeatReceivedTime;
 
-    public DiscussionGroupItem(String groupName, InetAddress multicastGroupAddress, String noOfMembers) {
+    public DiscussionGroupItem(String groupName, InetAddress multicastGroupAddress, String noOfMembers, Long heartBeatReceivedTime) {
         this.groupName = groupName;
         this.multicastGroupAddress = multicastGroupAddress;
         this.noOfMembers = noOfMembers;
+        this.heartBeatReceivedTime = heartBeatReceivedTime;
     }
 
     public String getGroupName() {
@@ -38,6 +41,14 @@ public class DiscussionGroupItem implements Comparable<DiscussionGroupItem>{
         this.noOfMembers = noOfMembers;
     }
 
+    public Long getHeartBeatReceivedTime() {
+        return heartBeatReceivedTime;
+    }
+
+    public void setHeartBeatReceivedTime(Long heartBeatReceivedTime) {
+        this.heartBeatReceivedTime = heartBeatReceivedTime;
+    }
+
     @Override
     public String toString() {
         return groupName;
@@ -53,5 +64,18 @@ public class DiscussionGroupItem implements Comparable<DiscussionGroupItem>{
         } else {
             return 0;
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof DiscussionGroupItem)) return false;
+        DiscussionGroupItem other = (DiscussionGroupItem) obj;
+        return Objects.equals(groupName, other.groupName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(groupName);
     }
 }
