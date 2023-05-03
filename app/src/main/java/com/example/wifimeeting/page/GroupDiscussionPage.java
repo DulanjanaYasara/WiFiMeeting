@@ -253,20 +253,20 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
                 }
                 muteUnmuteButtonLastClickTime = SystemClock.elapsedRealtime();
 
-                boolean isMuteValue = muteUnmuteButton.getText().toString().equals(getString(R.string.mute));
+                isMute = !isMute;
 
-                muteUnmuteButton.setText(isMuteValue? R.string.unmute: R.string.mute);
-                muteUnmuteButton.setIcon(
-                        isMuteValue?
-                                getResources().getDrawable(R.drawable.baseline_mic_off_24):
-                                getResources().getDrawable(R.drawable.baseline_mic_24));
-                muteUnmuteMeeting.multicastMuteUnmute(Constants.MUTE_ACTION,name, isMuteValue);
-
-                if(isMuteValue)
+                if(isMute){
+                    muteUnmuteButton.setText(R.string.unmute);
+                    muteUnmuteButton.setIcon(getResources().getDrawable(R.drawable.baseline_mic_24));
                     audioCall.muteMeFromMeeting();
-                else
+
+                } else {
+                    muteUnmuteButton.setText(R.string.mute);
+                    muteUnmuteButton.setIcon(getResources().getDrawable(R.drawable.baseline_mic_off_24));
                     audioCall.unmuteMeFromMeeting();
 
+                }
+                muteUnmuteMeeting.multicastMuteUnmute(Constants.MUTE_ACTION,name, isMute);
             }
         };
     }
