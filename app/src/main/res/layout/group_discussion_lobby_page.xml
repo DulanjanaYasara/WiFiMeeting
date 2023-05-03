@@ -37,7 +37,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/multicast_group_address"
-
+        app:errorEnabled="true"
         app:endIconDrawable="@drawable/baseline_refresh_24"
         app:endIconMode="custom"
         app:endIconTint="@color/colorPrimaryDark"

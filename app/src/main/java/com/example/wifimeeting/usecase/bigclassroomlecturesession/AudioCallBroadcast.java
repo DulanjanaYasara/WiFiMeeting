@@ -23,8 +23,10 @@ public class AudioCallBroadcast {
     private boolean mic = false; // Enable mic?
     private boolean speakers = false; // Enable speakers?
     private Boolean isMute;
+    private int audioCallPort;
 
-    public AudioCallBroadcast(InetAddress myAddress, InetAddress address, Boolean isMute) {
+    public AudioCallBroadcast(InetAddress myAddress, InetAddress address, Boolean isMute, int audioCallPort) {
+        this.audioCallPort = audioCallPort;
         this.myAddress = myAddress;
         this.isMute = isMute;
         this.address = address;
@@ -102,7 +104,7 @@ public class AudioCallBroadcast {
 
                     while (mic) {
                         bytes_read = audioRecorder.read(buf, 0, BUF_SIZE);
-                        DatagramPacket packet = new DatagramPacket(buf, bytes_read, address, Constants.AUDIO_CALL_BROADCAST_PORT);
+                        DatagramPacket packet = new DatagramPacket(buf, bytes_read, address, audioCallPort);
                         socket.send(packet);
                         bytes_sent += bytes_read;
                         Log.i(Constants.AUDIO_CALL_LOG_TAG, "Total bytes sent: " + bytes_sent);
@@ -151,7 +153,7 @@ public class AudioCallBroadcast {
 
                         socket = new DatagramSocket(null);
                         socket.setReuseAddress(true);
-                        socket.bind(new InetSocketAddress(Constants.AUDIO_CALL_BROADCAST_PORT));
+                        socket.bind(new InetSocketAddress(audioCallPort));
                         byte[] buf = new byte[BUF_SIZE];
 
                         while (speakers) {

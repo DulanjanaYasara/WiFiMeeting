@@ -2,7 +2,7 @@ package com.example.wifimeeting.usecase.smallgroupdiscussion;
 
 import android.util.Log;
 
-import com.example.wifimeeting.page.LectureSessionPage;
+import com.example.wifimeeting.page.GroupDiscussionPage;
 import com.example.wifimeeting.utils.Constants;
 
 import java.io.IOException;
@@ -15,10 +15,10 @@ import java.net.SocketTimeoutException;
 public class MuteUnmuteMeetingMulticast {
 
     private boolean LISTEN_MUTE_MEETING = true;
-    private LectureSessionPage uiPage;
+    private GroupDiscussionPage uiPage;
     private InetAddress multicastIP;
 
-    public MuteUnmuteMeetingMulticast(LectureSessionPage uiPage, InetAddress multicastIP) {
+    public MuteUnmuteMeetingMulticast(GroupDiscussionPage uiPage, InetAddress multicastIP) {
         this.uiPage = uiPage;
         this.multicastIP = multicastIP;
 

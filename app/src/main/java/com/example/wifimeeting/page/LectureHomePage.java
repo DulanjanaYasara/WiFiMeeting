@@ -13,8 +13,7 @@ import androidx.fragment.app.Fragment;
 import com.example.wifimeeting.R;
 import com.example.wifimeeting.navigation.NavigationHost;
 import com.example.wifimeeting.utils.Constants;
-import com.example.wifimeeting.utils.MyDetails;
-import com.example.wifimeeting.utils.Role;
+import com.example.wifimeeting.utils.LectureSessionMember;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
@@ -39,7 +38,7 @@ public class LectureHomePage extends Fragment {
         portEditText = view.findViewById(R.id.port_edit_text);
         lecturerNameTextInput = view.findViewById(R.id.lecturer_name_text_input);
         lecturerNameEditText = view.findViewById(R.id.lecturer_name_edit_text);
-        portEditText.setText(Constants.DEFAULT_PORT);
+        portEditText.setText(String.valueOf(Constants.DEFAULT_AUDIO_CALL_PORT));
 
         joinLectureButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -52,9 +51,9 @@ public class LectureHomePage extends Fragment {
                         Snackbar.make(view, R.string.permission_mandatory, Snackbar.LENGTH_SHORT).show();
 				    else {
                         Bundle bundle = new Bundle();
-                        bundle.putString(MyDetails.NAME.toString(), Objects.requireNonNull(lecturerNameEditText.getText()).toString().trim());
-                        bundle.putBoolean(MyDetails.IS_MUTE.toString(), false);
-                        bundle.putString(MyDetails.ROLE.toString(), Role.LECTURER.toString());
+                        bundle.putString(LectureSessionMember.NAME.toString(), Objects.requireNonNull(lecturerNameEditText.getText()).toString().trim());
+                        bundle.putBoolean(LectureSessionMember.IS_MUTE.toString(), false);
+                        bundle.putInt(LectureSessionMember.PORT.toString(), Integer.parseInt(portEditText.getText().toString()));
 
                         LectureSessionPage lectureSessionPage = new LectureSessionPage();
                         lectureSessionPage.setArguments(bundle);

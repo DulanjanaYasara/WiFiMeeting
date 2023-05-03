@@ -25,8 +25,7 @@ import com.example.wifimeeting.usecase.bigclassroomlecturesession.LeaveMeetingBr
 import com.example.wifimeeting.usecase.bigclassroomlecturesession.MuteUnmuteMeetingBroadcast;
 import com.example.wifimeeting.utils.AddressGenerator;
 import com.example.wifimeeting.utils.Constants;
-import com.example.wifimeeting.utils.MyDetails;
-import com.example.wifimeeting.utils.Role;
+import com.example.wifimeeting.utils.LectureSessionMember;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -49,7 +48,7 @@ public class LectureSessionPage extends Fragment implements BackPressedListener{
      */
     private String name = null;
     private Boolean isMute = true;
-    private String role;
+    private int port;
 
     private LinkedHashMap<String, Boolean> memberHashMap = new LinkedHashMap<>();
     Handler handler = new Handler();
@@ -71,9 +70,10 @@ public class LectureSessionPage extends Fragment implements BackPressedListener{
 
         if(this.getArguments() != null){
             Bundle bundle = this.getArguments();
-            name = bundle.getString(MyDetails.NAME.toString());
-            isMute = bundle.getBoolean(MyDetails.IS_MUTE.toString());
-            role = bundle.getString(MyDetails.ROLE.toString());
+            name = bundle.getString(LectureSessionMember.NAME.toString());
+            isMute = bundle.getBoolean(LectureSessionMember.IS_MUTE.toString());
+            port = bundle.getInt(LectureSessionMember.PORT.toString());
+
             readyUiView();
         }
 
@@ -100,7 +100,7 @@ public class LectureSessionPage extends Fragment implements BackPressedListener{
 
         // Set up the RecyclerView
         initiateRecyclerView(view);
-        audioCall = new AudioCallBroadcast(addressGenerator.getIpAddress(), broadcastIp, isMute);
+        audioCall = new AudioCallBroadcast(addressGenerator.getIpAddress(), broadcastIp, isMute, port);
         initializeMeeting();
 
         leaveButton.setOnClickListener(leaveButtonClickEvent());
@@ -135,9 +135,9 @@ public class LectureSessionPage extends Fragment implements BackPressedListener{
             case Constants.MUTE_ACTION:{
 
                 if (memberHashMap.containsKey(nameValue)) {
-                    Log.i(Constants.MEETING_PAGE_LOG_TAG, "Updating member: " + nameValue);
+                    Log.i(Constants.LECTURE_SESSION_PAGE_LOG_TAG, "Updating member: " + nameValue);
                 } else {
-                    Log.i(Constants.MEETING_PAGE_LOG_TAG, "Adding member: " + nameValue);
+                    Log.i(Constants.LECTURE_SESSION_PAGE_LOG_TAG, "Adding member: " + nameValue);
                 }
                 memberHashMap.put(nameValue, isMuteValue);
                 handler.post(new Runnable() {
@@ -147,7 +147,7 @@ public class LectureSessionPage extends Fragment implements BackPressedListener{
 
                     }
                 });
-                Log.i(Constants.MEETING_PAGE_LOG_TAG, "#Members: " + memberHashMap.size());
+                Log.i(Constants.LECTURE_SESSION_PAGE_LOG_TAG, "#Members: " + memberHashMap.size());
                 break;
             }
 
@@ -155,7 +155,7 @@ public class LectureSessionPage extends Fragment implements BackPressedListener{
             case Constants.ABSENT_ACTION:{
 
                 if(memberHashMap.containsKey(nameValue)) {
-                    Log.i(Constants.MEETING_PAGE_LOG_TAG, "Removing member: " + nameValue);
+                    Log.i(Constants.LECTURE_SESSION_PAGE_LOG_TAG, "Removing member: " + nameValue);
                     memberHashMap.remove(nameValue);
                     handler.post(new Runnable() {
                         @Override
@@ -164,15 +164,15 @@ public class LectureSessionPage extends Fragment implements BackPressedListener{
 
                         }
                     });
-                    Log.i(Constants.MEETING_PAGE_LOG_TAG, "#Members: " + memberHashMap.size());
+                    Log.i(Constants.LECTURE_SESSION_PAGE_LOG_TAG, "#Members: " + memberHashMap.size());
                     return;
                 }
-                Log.i(Constants.MEETING_PAGE_LOG_TAG, "Cannot remove member. " + name + " does not exist.");
+                Log.i(Constants.LECTURE_SESSION_PAGE_LOG_TAG, "Cannot remove member. " + name + " does not exist.");
                 break;
             }
 
             default:
-                Log.i(Constants.MEETING_PAGE_LOG_TAG, "Action not found");
+                Log.i(Constants.LECTURE_SESSION_PAGE_LOG_TAG, "Action not found");
         }
 
     }
@@ -192,14 +192,13 @@ public class LectureSessionPage extends Fragment implements BackPressedListener{
         if(name!= null)
             memberName.setText(name);
         if(isMute){
-            if(role != null){
-                muteUnmuteButton.setText(role.equals(Role.LECTURER.toString())? R.string.mute: R.string.unmute);
-                muteUnmuteButton.setIcon(
-                        role.equals(Role.LECTURER.toString())?
-                                getResources().getDrawable(R.drawable.baseline_mic_off_24):
-                                getResources().getDrawable(R.drawable.baseline_mic_24));
-            }
+            muteUnmuteButton.setText( R.string.unmute);
+            muteUnmuteButton.setIcon(getResources().getDrawable(R.drawable.baseline_mic_24));
+        } else {
+            muteUnmuteButton.setText(R.string.mute);
+            muteUnmuteButton.setIcon(getResources().getDrawable(R.drawable.baseline_mic_off_24));
         }
+
     }
 
     private View.OnClickListener muteUnmuteButtonClickEvent() {

@@ -3,6 +3,7 @@ package com.example.wifimeeting.usecase.smallgroupdiscussion;
 import android.util.Log;
 
 import com.example.wifimeeting.page.GroupDiscussionLobbyPage;
+import com.example.wifimeeting.page.GroupDiscussionPage;
 import com.example.wifimeeting.utils.Constants;
 
 import java.net.DatagramPacket;
@@ -13,24 +14,20 @@ import java.net.SocketTimeoutException;
 import java.util.Arrays;
 import java.util.List;
 
-public class CreateMeetingBroadcast {
+public class CreateMeetingBroadcast{
 
     private boolean LISTEN_CREATE_MEETING = true;
     private boolean BROADCAST = true;
-    private GroupDiscussionLobbyPage uiPage;
     private InetAddress broadcastIP;
 
-    public CreateMeetingBroadcast(GroupDiscussionLobbyPage uiPage, InetAddress broadcastIP) {
-        this.uiPage = uiPage;
+    public CreateMeetingBroadcast(InetAddress broadcastIP) {
         this.broadcastIP = broadcastIP;
-
-        listenCreateMeeting();
     }
 
     /**
      * Broadcast the CREATE 
      */
-    public void broadcastCreatePresent(String action, String groupName, String noOfMembers, String multicastAddress) {
+    public void broadcastCreate(GroupDiscussionPage groupDiscussionUi, String action, String groupName, String multicastAddress) {
 
         Log.i(Constants.CREATE_MEETING_LOG_TAG, "Broadcasting CREATE Action started!");
         Thread broadcastThread = new Thread(new Runnable() {
@@ -40,13 +37,14 @@ public class CreateMeetingBroadcast {
                 DatagramSocket socket = null;
 
                 try {
-                    String request = action + groupName + Constants.STRING_SEPARATOR + multicastAddress + Constants.STRING_SEPARATOR + noOfMembers;
-                    byte[] message = request.getBytes();
                     socket = new DatagramSocket();
                     socket.setBroadcast(true);
-                    DatagramPacket packet = new DatagramPacket(message, message.length, broadcastIP, Constants.MARK_CREATE_BROADCAST_PORT);
 
                     while(BROADCAST) {
+                        String request = action + groupName + Constants.STRING_SEPARATOR + multicastAddress + Constants.STRING_SEPARATOR + groupDiscussionUi.getMemberHashMapSize();
+                        byte[] message = request.getBytes();
+                        DatagramPacket packet = new DatagramPacket(message, message.length, broadcastIP, Constants.MARK_CREATE_BROADCAST_PORT);
+
                         socket.send(packet);
                         Log.i(Constants.CREATE_MEETING_LOG_TAG, "CREATE Action Broadcast packet sent: " + packet.getAddress().toString());
                         Thread.sleep(Constants.CREATE_MEETING_BROADCAST_INTERVAL);
@@ -76,7 +74,7 @@ public class CreateMeetingBroadcast {
     /**
      * Listening thread for create meeting
      */
-    public void listenCreateMeeting() {
+    public void listenCreateMeeting(GroupDiscussionLobbyPage discussionLobbyUi) {
 
         Log.i(Constants.CREATE_MEETING_LOG_TAG, "Listening started for create meeting!");
 
@@ -131,7 +129,7 @@ public class CreateMeetingBroadcast {
                     if (receivedAction.equals(Constants.CREATE_ACTION)) {
                         Log.i(Constants.CREATE_MEETING_LOG_TAG, "Create Meeting Listener received CREATE request");
 
-                        uiPage.updateGroupDiscussionDetails(groupName, multicastIpAddress, noOfMembers);
+                        discussionLobbyUi.updateGroupDiscussionDetails(groupName, multicastIpAddress, noOfMembers);
 
                     } else {
                         Log.w(Constants.CREATE_MEETING_LOG_TAG, "Create Meeting Listener received invalid request: " + receivedAction);

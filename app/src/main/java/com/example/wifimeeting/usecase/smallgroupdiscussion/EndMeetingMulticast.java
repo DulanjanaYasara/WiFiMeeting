@@ -2,7 +2,7 @@ package com.example.wifimeeting.usecase.smallgroupdiscussion;
 
 import android.util.Log;
 
-import com.example.wifimeeting.page.LectureSessionPage;
+import com.example.wifimeeting.page.GroupDiscussionPage;
 import com.example.wifimeeting.utils.Constants;
 
 import java.io.IOException;
@@ -16,13 +16,9 @@ public class EndMeetingMulticast {
 
     private boolean LISTEN_END_MEETING = true;
     private InetAddress multicastIP;
-    private LectureSessionPage uiPage;
 
-    public EndMeetingMulticast(LectureSessionPage uiPage, InetAddress multicastIP) {
-        this.uiPage = uiPage;
+    public EndMeetingMulticast(InetAddress multicastIP) {
         this.multicastIP = multicastIP;
-
-        listenEndMeeting();
     }
 
     /**
@@ -63,7 +59,7 @@ public class EndMeetingMulticast {
     /**
      * Listening thread for End meeting
      */
-    public void listenEndMeeting() {
+    public void listenEndMeeting(GroupDiscussionPage uiPage) {
 
         Log.i(Constants.END_MEETING_LOG_TAG, "Listening started for End meeting!");
 
@@ -120,9 +116,7 @@ public class EndMeetingMulticast {
 
                     if (receivedAction.equals(Constants.END_ACTION)) {
                         Log.i(Constants.END_MEETING_LOG_TAG, "End Meeting Listener received END request");
-
-                        //TODO:same as clicking on the leave button
-//                        uiPage.leaveMeeting();
+                        uiPage.leaveMeeting();
                         
                     } else {
                         Log.w(Constants.END_MEETING_LOG_TAG, "End Meeting Listener received invalid request: " + receivedAction);
