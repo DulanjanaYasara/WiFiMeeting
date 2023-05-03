@@ -149,7 +149,8 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
 
                     if (timedOutPeerIndices.size()>0){
                         for (Integer peer: timedOutPeerIndices) {
-                            groupDiscussionDetails.remove(peer);
+                            Log.i(Constants.GROUP_DISCUSSION_LOBBY_PAGE_LOG_TAG, "Group Discussion Details Removing group: "+groupDiscussionDetails.get(peer).getGroupName());
+                            groupDiscussionDetails.remove(peer.intValue());
                         }
 
                         handler.post(new Runnable() {
@@ -184,6 +185,8 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
                     if(groupDiscussionDetails.get(i).getGroupName().equals(groupName)){
                         groupDiscussionDetails.set(i, new DiscussionGroupItem(groupName, InetAddress.getByName(multicastIpAddress), noOfMembers, System.currentTimeMillis()));
 
+                        Log.i(Constants.GROUP_DISCUSSION_LOBBY_PAGE_LOG_TAG, "Group Discussion Details Updated: Heartbeat");
+
                         if(Integer.parseInt(groupDiscussionDetails.get(i).getNoOfMembers())!= Integer.parseInt(noOfMembers)){
                             handler.post(new Runnable() {
                                 @Override
@@ -191,6 +194,8 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
                                     listGroupItemAdapter.notifyDataSetChanged();
                                 }
                             });
+                            Log.i(Constants.GROUP_DISCUSSION_LOBBY_PAGE_LOG_TAG, "Group Discussion Details Updated. #Groups: "+groupDiscussionDetails.size());
+
                         }
                         break;
                     }
@@ -203,6 +208,7 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
                         listGroupItemAdapter.notifyDataSetChanged();
                     }
                 });
+                Log.i(Constants.GROUP_DISCUSSION_LOBBY_PAGE_LOG_TAG, "Group Discussion Details Adding Group: "+ groupName);
             }
 
         } catch (Exception ex){
@@ -232,23 +238,30 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
                     selectGroupTextInput.setError(getString(R.string.group_mandatory));
                 } else {
                     selectGroupTextInput.setError(null);
+                }
 
-                    //stop listening
-                    if(createMeetingBroadcast !=null)
-                        createMeetingBroadcast.stopListeningCreateMeeting();
+                if (selectGroupTextInput.getError() == null){
+                    if (selectedDiscussionGroupIndex >= groupDiscussionDetails.size()){
+                        Snackbar.make(view, R.string.group_does_not_exist, Snackbar.LENGTH_SHORT).show();
+                    } else {
 
-                    Bundle bundle = new Bundle();
-                    bundle.putString(GroupDiscussionMember.NAME.toString(), name);
-                    bundle.putBoolean(GroupDiscussionMember.IS_MUTE.toString(), true);
-                    bundle.putString(GroupDiscussionMember.GROUP_NAME.toString(), groupDiscussionDetails.get(selectedDiscussionGroupIndex).getGroupName());
-                    bundle.putBoolean(GroupDiscussionMember.IS_ADMIN.toString(), false);
-                    bundle.putInt(GroupDiscussionMember.PORT.toString(), port);
-                    bundle.putString(GroupDiscussionMember.MULTICAST_GROUP_ADDRESS.toString(), groupDiscussionDetails.get(selectedDiscussionGroupIndex).getMulticastGroupAddress().getHostAddress());
+                        //stop listening
+                        if (createMeetingBroadcast != null)
+                            createMeetingBroadcast.stopListeningCreateMeeting();
 
-                    GroupDiscussionPage groupDiscussionPage = new GroupDiscussionPage();
-                    groupDiscussionPage.setArguments(bundle);
+                        Bundle bundle = new Bundle();
+                        bundle.putString(GroupDiscussionMember.NAME.toString(), name);
+                        bundle.putBoolean(GroupDiscussionMember.IS_MUTE.toString(), true);
+                        bundle.putString(GroupDiscussionMember.GROUP_NAME.toString(), groupDiscussionDetails.get(selectedDiscussionGroupIndex).getGroupName());
+                        bundle.putBoolean(GroupDiscussionMember.IS_ADMIN.toString(), false);
+                        bundle.putInt(GroupDiscussionMember.PORT.toString(), port);
+                        bundle.putString(GroupDiscussionMember.MULTICAST_GROUP_ADDRESS.toString(), groupDiscussionDetails.get(selectedDiscussionGroupIndex).getMulticastGroupAddress().getHostAddress());
 
-                    ((NavigationHost) getActivity()).navigateTo(groupDiscussionPage, true);
+                        GroupDiscussionPage groupDiscussionPage = new GroupDiscussionPage();
+                        groupDiscussionPage.setArguments(bundle);
+
+                        ((NavigationHost) getActivity()).navigateTo(groupDiscussionPage, true);
+                    }
                 }
             }
         };
@@ -272,7 +285,7 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
 
                 if (groupNameTextInput.getError() == null && multicastGroupTextInput.getError() == null) {
 
-                    String multicastGroupAddress = multicastGroupEditText.toString().trim();
+                    String multicastGroupAddress = multicastGroupEditText.getText().toString().trim();
                     if(!validateMulticastGroupAddress(multicastGroupAddress)){
                         Snackbar.make(view, R.string.multicast_group_address_validation_error, Snackbar.LENGTH_SHORT).show();
                         return;
@@ -285,7 +298,7 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
                     Bundle bundle = new Bundle();
                     bundle.putString(GroupDiscussionMember.NAME.toString(), name);
                     bundle.putBoolean(GroupDiscussionMember.IS_MUTE.toString(), true);
-                    bundle.putString(GroupDiscussionMember.GROUP_NAME.toString(), groupNameEditText.toString().trim());
+                    bundle.putString(GroupDiscussionMember.GROUP_NAME.toString(), groupNameEditText.getText().toString().trim());
                     bundle.putBoolean(GroupDiscussionMember.IS_ADMIN.toString(), true);
                     bundle.putInt(GroupDiscussionMember.PORT.toString(), port);
                     bundle.putString(GroupDiscussionMember.MULTICAST_GROUP_ADDRESS.toString(), multicastGroupAddress);

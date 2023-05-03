@@ -17,7 +17,8 @@
     <string name="login">Login</string>
     <string name="join_lecture">Join Lecture</string>
     <string name="confirm">Confirm</string>
-    <string name="leave_meeting_confirmation">Are you sure you want to leave meeting?</string>
+    <string name="leave_lecture_session_confirmation">Are you sure you want to leave lecture session?</string>
+    <string name="leave_discussion_group_confirmation">Are you sure you want to leave discussion group?</string>
 
     <!--    Error Messages-->
     <string name="port_mandatory">Port is required</string>
@@ -35,6 +36,7 @@
     <string name="permission_mandatory">Permission Required!</string>
     <string name="multicast_group_address_mandatory">Multicast Group Address Required</string>
     <string name="multicast_group_address_validation_error">Multicast Group Address INVALID or already OCCUPIED</string>
+    <string name="group_does_not_exist">Group does not exist!</string>
 
 
     <string name="username">Username</string>

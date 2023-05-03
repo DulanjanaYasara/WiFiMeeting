@@ -99,7 +99,7 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
         //leave alert dialog initialize
         leaveAlertDialog =  new MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_App_MaterialAlertDialog)
                 .setTitle(R.string.confirm)
-                .setMessage(R.string.leave_meeting_confirmation)
+                .setMessage(R.string.leave_discussion_group_confirmation)
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
