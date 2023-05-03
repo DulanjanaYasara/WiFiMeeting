@@ -34,7 +34,7 @@
     <string name="login_failed">Login Failed!</string>
     <string name="permission_mandatory">Permission Required!</string>
     <string name="multicast_group_address_mandatory">Multicast Group Address Required</string>
-    <string name="multicast_group_address_validation_error">Multicast Group Address INVALID or already OCCUPIED. Please choose another!</string>
+    <string name="multicast_group_address_validation_error">Multicast Group Address INVALID or already OCCUPIED</string>
 
 
     <string name="username">Username</string>

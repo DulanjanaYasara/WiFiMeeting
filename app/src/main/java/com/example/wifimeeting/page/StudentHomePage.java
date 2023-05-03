@@ -43,7 +43,7 @@ public class StudentHomePage extends Fragment {
         portEditText = view.findViewById(R.id.port_edit_text);
         studentNameTextInput = view.findViewById(R.id.student_name_text_input);
         studentNameEditText = view.findViewById(R.id.student_name_edit_text);
-        portEditText.setText(Constants.DEFAULT_AUDIO_CALL_PORT);
+        portEditText.setText(String.valueOf(Constants.DEFAULT_AUDIO_CALL_PORT));
 
         smallGroupDiscussionButton.setOnClickListener(new View.OnClickListener() {
             @Override

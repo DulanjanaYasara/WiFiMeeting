@@ -128,6 +128,7 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
     public void onBackPressed() {
         if(createMeetingBroadcast !=null)
             createMeetingBroadcast.stopListeningCreateMeeting();
+        requireFragmentManager().popBackStack();
     }
 
     private class GroupDiscussionDetailsUpdate implements Runnable{
