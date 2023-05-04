@@ -6,7 +6,7 @@ public class Constants {
     public static final String GROUP_SUFFIX = "_Group";
     public static final String STRING_SEPARATOR = "#";
     public static final int PASSWORD_MAX_LENGTH = 12;
-    public static final int MUTE_UNMUTE_BUTTON_THRESHOLD_MILLISECONDS = 3000;
+    public static final int MUTE_UNMUTE_BUTTON_THRESHOLD_MILLISECONDS = 1000;
     public static final int GROUP_DISCUSSION_HEARTBEAT_INTERVAL = 5000; // 5 seconds
     public static final int GROUP_DISCUSSION_DISCOVERY_TIMEOUT_MILLISECONDS = 15000;
     public static final int REQUEST_AUDIO_PERMISSION_CODE = 1;

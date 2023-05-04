@@ -30,6 +30,7 @@ import com.example.wifimeeting.utils.Constants;
 import com.example.wifimeeting.utils.GroupDiscussionMember;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -103,8 +104,7 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        requireFragmentManager().popBackStack();
-                        leaveMeeting();
+                        leaveMeeting(false);
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -145,7 +145,12 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
         }
     }
 
-    public void leaveMeeting(){
+    public void leaveMeeting(boolean isAdminTriggered){
+
+        requireFragmentManager().popBackStack();
+        if(isAdminTriggered){
+            Snackbar.make(this.requireView(), R.string.admin_end_meeting, Snackbar.LENGTH_SHORT).show();
+        }
 
         //if admin leaves then multicast all members have to leave
         if(isAdmin){

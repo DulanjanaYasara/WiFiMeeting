@@ -116,7 +116,7 @@ public class EndMeetingMulticast {
 
                     if (receivedAction.equals(Constants.END_ACTION)) {
                         Log.i(Constants.END_MEETING_LOG_TAG, "End Meeting Listener received END request");
-                        uiPage.leaveMeeting();
+                        uiPage.leaveMeeting(true);
                         
                     } else {
                         Log.w(Constants.END_MEETING_LOG_TAG, "End Meeting Listener received invalid request: " + receivedAction);
