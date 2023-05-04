@@ -17,6 +17,10 @@ public class DiscussionGroupItem implements Comparable<DiscussionGroupItem>{
         this.heartBeatReceivedTime = heartBeatReceivedTime;
     }
 
+    public DiscussionGroupItem(String groupName){
+        this.groupName = groupName;
+    }
+
     public String getGroupName() {
         return groupName;
     }

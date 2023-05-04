@@ -57,7 +57,7 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
     private int port;
     private InetAddress multicastGroupAddress;
 
-    private LinkedHashMap<String, Boolean> memberHashMap = new LinkedHashMap<>();
+    private LinkedHashMap<String, Boolean> memberHashMap;
     Handler handler = new Handler();
     private InetAddress broadcastIp;
 
@@ -80,6 +80,8 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
         leaveButton = view.findViewById(R.id.leave_button);
         muteUnmuteButton = view.findViewById(R.id.mute_unmute_button);
         memberName = view.findViewById(R.id.member_name);
+
+        memberHashMap = new LinkedHashMap<>();
 
         if(this.getArguments() != null){
             Bundle bundle = this.getArguments();
@@ -213,8 +215,16 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
                     });
                     Log.i(Constants.GROUP_DISCUSSION_PAGE_LOG_TAG, "#Members: " + memberHashMap.size());
                     return;
+                } else {
+                    Log.i(Constants.GROUP_DISCUSSION_PAGE_LOG_TAG, "Cannot remove member. " + name + " does not exist.");
                 }
-                Log.i(Constants.GROUP_DISCUSSION_PAGE_LOG_TAG, "Cannot remove member. " + name + " does not exist.");
+
+                //stop the 'create meeting broadcast' if the discussion group has maximum number of members
+                if(createMeeting !=null && memberHashMap.size() == Constants.SMALL_GROUP_DISCUSSION_MEMBER_MAX_COUNT - 1) {
+                    createMeeting.startBroadcasting();
+                    createMeeting.broadcastCreate(this, Constants.CREATE_ACTION, groupName, multicastGroupAddress.getHostAddress());
+                    return;
+                }
                 break;
             }
 

@@ -66,6 +66,10 @@ public class CreateMeetingBroadcast{
         broadcastThread.start();
     }
 
+    public void startBroadcasting(){
+        BROADCAST = true;
+    }
+
     public void stopBroadcasting() {
         // Ends the broadcasting thread
         BROADCAST = false;
