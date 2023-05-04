@@ -74,7 +74,7 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
         multicastGroupEditText.setText(generateMulticastAddress());
 
         initiateGroupListTextView(view);
-        groupListTextView.setOnItemClickListener(arraylistSelectItemEvent());
+        groupListTextView.setOnItemClickListener(arraylistClickItemEvent());
         multicastGroupTextInput.setEndIconOnClickListener(multicastGroupRefreshIconClickEvent());
         joinButton.setOnClickListener(joinButtonClickEvent());
         createButton.setOnClickListener(createButtonClickEvent());
@@ -91,7 +91,7 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
         return view;
     }
 
-    private AdapterView.OnItemClickListener arraylistSelectItemEvent(){
+    private AdapterView.OnItemClickListener arraylistClickItemEvent(){
         return new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
@@ -151,14 +151,13 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
                         for (Integer peer: timedOutPeerIndices) {
                             Log.i(Constants.GROUP_DISCUSSION_LOBBY_PAGE_LOG_TAG, "Group Discussion Details Removing group: "+groupDiscussionDetails.get(peer).getGroupName());
                             groupDiscussionDetails.remove(peer.intValue());
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    listGroupItemAdapter.notifyDataSetChanged();
+                                }
+                            });
                         }
-
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                listGroupItemAdapter.notifyDataSetChanged();
-                            }
-                        });
                     }
 
                     Thread.sleep(Constants.GROUP_DISCUSSION_HEARTBEAT_INTERVAL);
@@ -180,7 +179,7 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
     public synchronized void updateGroupDiscussionDetails(String groupName, String multicastIpAddress, String noOfMembers){
 
         try {
-            if(groupDiscussionDetails.contains(groupName)) {
+            if(groupDiscussionDetails.contains(new DiscussionGroupItem(groupName))) {
                 for (int i=0; i< groupDiscussionDetails.size(); i++){
                     if(groupDiscussionDetails.get(i).getGroupName().equals(groupName)){
                         groupDiscussionDetails.set(i, new DiscussionGroupItem(groupName, InetAddress.getByName(multicastIpAddress), noOfMembers, System.currentTimeMillis()));
@@ -230,7 +229,7 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
         };
     }
 
-    private View.OnClickListener joinButtonClickEvent() {
+    private synchronized View.OnClickListener joinButtonClickEvent() {
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -267,7 +266,7 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
         };
     }
 
-    private View.OnClickListener createButtonClickEvent() {
+    private synchronized View.OnClickListener createButtonClickEvent() {
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
