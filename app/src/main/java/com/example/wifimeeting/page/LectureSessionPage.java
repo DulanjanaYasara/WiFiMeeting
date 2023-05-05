@@ -63,7 +63,7 @@ public class LectureSessionPage extends Fragment implements BackPressedListener{
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.meeting_page, container, false);
+        View view = inflater.inflate(R.layout.lecture_session_page, container, false);
         leaveButton = view.findViewById(R.id.leave_button);
         muteUnmuteButton = view.findViewById(R.id.mute_unmute_button);
         memberName = view.findViewById(R.id.member_name);

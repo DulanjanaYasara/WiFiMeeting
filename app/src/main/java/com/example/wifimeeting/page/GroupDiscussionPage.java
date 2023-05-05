@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -39,7 +40,8 @@ import java.util.LinkedHashMap;
 public class GroupDiscussionPage extends Fragment implements BackPressedListener{
 
     MaterialButton leaveButton, muteUnmuteButton;
-    TextView memberName;
+    TextView memberName, groupNameTextView;
+    ImageView memberImageView;
     MaterialAlertDialogBuilder leaveAlertDialog;
     MemberCardRecyclerViewAdapter viewAdapter;
     RecyclerView recyclerView;
@@ -76,10 +78,12 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.meeting_page, container, false);
+        View view = inflater.inflate(R.layout.group_discussion_page, container, false);
         leaveButton = view.findViewById(R.id.leave_button);
         muteUnmuteButton = view.findViewById(R.id.mute_unmute_button);
         memberName = view.findViewById(R.id.member_name);
+        groupNameTextView =  view.findViewById(R.id.group_name);
+        memberImageView = view.findViewById(R.id.memberImage);
 
         memberHashMap = new LinkedHashMap<>();
 
@@ -248,6 +252,10 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
     private void readyUiView (){
         if(name!= null)
             memberName.setText(name);
+        if(groupName!=null)
+            groupNameTextView.setText(groupName);
+        memberImageView.setImageResource(isAdmin? R.drawable.baseline_manage_accounts_24: R.drawable.baseline_person_24);
+
         if(isMute){
                 muteUnmuteButton.setText(R.string.unmute);
                 muteUnmuteButton.setIcon(getResources().getDrawable(R.drawable.baseline_mic_24));

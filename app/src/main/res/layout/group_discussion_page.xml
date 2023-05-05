@@ -51,28 +51,62 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/imageButton"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:padding="10dp"
-                android:scaleType="fitEnd"
-                app:srcCompat="@drawable/baseline_person_24"
-                app:tint="@color/colorAccent" />
-
-            <TextView
-                android:id="@+id/member_name"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:text="@string/member_name"
-                android:textAlignment="viewEnd"
-                android:textAppearance="?attr/textAppearanceSubtitle1" />
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/groupImage"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:scaleType="fitStart"
+                    app:srcCompat="@drawable/baseline_group_24"
+                    app:tint="@color/colorAccent" />
+
+                <ImageView
+                    android:id="@+id/memberImage"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:scaleType="fitEnd"
+                    app:srcCompat="@drawable/baseline_person_24"
+                    app:tint="@color/colorAccent" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/group_name"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="@string/group_name"
+                    android:ellipsize="end"
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
+                <TextView
+                    android:id="@+id/member_name"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:ellipsize="end"
+                    android:text="@string/member_name"
+                    android:textAlignment="viewEnd"
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
+
+            </LinearLayout>
 
             <RelativeLayout
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                >
+                android:paddingTop="5dp">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/mute_unmute_button"
