@@ -59,4 +59,10 @@ public class Constants {
     public static final String END_MEETING_LOG_TAG = "EndMeeting";
 
 
+    public static final String PEER_DISCOVERY_MANAGER_LOG_TAG = "PeerDiscoveryManagerPage";
+    public static final int SERVICE_INFO_PORT = 8856;
+    public static final String SERVICE_INFO_TYPE = "_sgd_jmdns._udp.local.";
+    public static final String SERVICE_INFO_NAME = "sgd_jmdns_service";
+    public static final int DISCOVERY_INTERVAL_MS = 500;
+
 }

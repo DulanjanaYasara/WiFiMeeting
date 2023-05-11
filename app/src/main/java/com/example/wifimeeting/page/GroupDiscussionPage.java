@@ -23,9 +23,7 @@ import com.example.wifimeeting.navigation.BackPressedListener;
 import com.example.wifimeeting.usecase.smallgroupdiscussion.AudioCallMulticast;
 import com.example.wifimeeting.usecase.smallgroupdiscussion.CreateMeetingBroadcast;
 import com.example.wifimeeting.usecase.smallgroupdiscussion.EndMeetingMulticast;
-import com.example.wifimeeting.usecase.smallgroupdiscussion.JoinMeetingMulticast;
-import com.example.wifimeeting.usecase.smallgroupdiscussion.LeaveMeetingMulticast;
-import com.example.wifimeeting.usecase.smallgroupdiscussion.MuteUnmuteMeetingMulticast;
+import com.example.wifimeeting.usecase.smallgroupdiscussion.PeerDiscoveryManager;
 import com.example.wifimeeting.utils.AddressGenerator;
 import com.example.wifimeeting.utils.Constants;
 import com.example.wifimeeting.utils.GroupDiscussionMember;
@@ -61,12 +59,10 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
 
     private LinkedHashMap<String, Boolean> memberHashMap;
     Handler handler = new Handler();
-    private InetAddress broadcastIp;
+    private InetAddress broadcastIp, myIp;
+    PeerDiscoveryManager discoveryManager;
 
     AudioCallMulticast audioCall;
-    JoinMeetingMulticast joinMeeting;
-    LeaveMeetingMulticast leaveMeeting;
-    MuteUnmuteMeetingMulticast muteUnmuteMeeting;
     CreateMeetingBroadcast createMeeting;
     EndMeetingMulticast endMeeting;
 
@@ -122,6 +118,7 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
 
         AddressGenerator addressGenerator = new AddressGenerator(view);
         broadcastIp = addressGenerator.getBroadcastIp();
+        myIp = addressGenerator.getIpAddress();
 
         // Set up the RecyclerView
         initiateRecyclerView(view);
@@ -136,9 +133,26 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
 
     private void initializeMeeting(){
         audioCall.startCall();
-        joinMeeting = new JoinMeetingMulticast(this,  name, isMute, multicastGroupAddress);
-        leaveMeeting = new LeaveMeetingMulticast(this,  multicastGroupAddress);
-        muteUnmuteMeeting = new MuteUnmuteMeetingMulticast(this, multicastGroupAddress);
+
+        //mDNS
+        discoveryManager = new PeerDiscoveryManager(new PeerDiscoveryManager.Listener() {
+            @Override
+            public void onDeviceListUpdated(LinkedHashMap<String, Boolean> updatedHasMap) {
+                memberHashMap = updatedHasMap;
+                Log.i(Constants.GROUP_DISCUSSION_PAGE_LOG_TAG, "MemberHashMap :"+ memberHashMap.toString());
+
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        viewAdapter.updateData(memberHashMap);
+
+                    }
+                });
+
+            }
+        }, myIp);
+        discoveryManager.registerService(name, isMute? "Y": "N");
+        discoveryManager.startDiscovery();
 
         endMeeting = new EndMeetingMulticast( multicastGroupAddress);
         if(isAdmin){
@@ -165,10 +179,8 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
         }
 
         audioCall.endCall();
-        leaveMeeting.multicastLeaveAbsent(Constants.LEAVE_ACTION,name);
-        joinMeeting.stopListeningJoinMeeting();
-        leaveMeeting.stopListeningLeaveMeeting();
-        muteUnmuteMeeting.stopListeningMuteUnmuteMeeting();
+        discoveryManager.unRegisterService(name);
+
         endMeeting.stopListeningEndMeeting();
     }
 
@@ -289,7 +301,7 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
                     audioCall.unmuteMeFromMeeting();
 
                 }
-                muteUnmuteMeeting.multicastMuteUnmute(Constants.MUTE_ACTION,name, isMute);
+                discoveryManager.toggleSound(name, isMute? "Y": "N");
             }
         };
     }
