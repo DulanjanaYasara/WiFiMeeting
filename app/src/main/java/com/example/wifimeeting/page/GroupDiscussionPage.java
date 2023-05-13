@@ -1,8 +1,13 @@
 package com.example.wifimeeting.page;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,7 +28,8 @@ import com.example.wifimeeting.navigation.BackPressedListener;
 import com.example.wifimeeting.usecase.smallgroupdiscussion.AudioCallMulticast;
 import com.example.wifimeeting.usecase.smallgroupdiscussion.CreateMeetingBroadcast;
 import com.example.wifimeeting.usecase.smallgroupdiscussion.EndMeetingMulticast;
-import com.example.wifimeeting.usecase.smallgroupdiscussion.PeerDiscoveryManager;
+import com.example.wifimeeting.usecase.smallgroupdiscussion.GroupMemberService;
+import com.example.wifimeeting.usecase.smallgroupdiscussion.MemberRegistryListener;
 import com.example.wifimeeting.utils.AddressGenerator;
 import com.example.wifimeeting.utils.Constants;
 import com.example.wifimeeting.utils.GroupDiscussionMember;
@@ -31,11 +37,31 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 
+import org.fourthline.cling.android.AndroidUpnpService;
+import org.fourthline.cling.android.AndroidUpnpServiceImpl;
+import org.fourthline.cling.binding.LocalServiceBindingException;
+import org.fourthline.cling.binding.annotations.AnnotationLocalServiceBinder;
+import org.fourthline.cling.model.DefaultServiceManager;
+import org.fourthline.cling.model.ValidationException;
+import org.fourthline.cling.model.message.header.STAllHeader;
+import org.fourthline.cling.model.meta.Device;
+import org.fourthline.cling.model.meta.DeviceDetails;
+import org.fourthline.cling.model.meta.DeviceIdentity;
+import org.fourthline.cling.model.meta.LocalDevice;
+import org.fourthline.cling.model.meta.LocalService;
+import org.fourthline.cling.model.types.DeviceType;
+import org.fourthline.cling.model.types.UDADeviceType;
+import org.fourthline.cling.model.types.UDAServiceType;
+import org.fourthline.cling.model.types.UDN;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.LinkedHashMap;
+import java.util.UUID;
 
-public class GroupDiscussionPage extends Fragment implements BackPressedListener{
+public class GroupDiscussionPage extends Fragment implements BackPressedListener, PropertyChangeListener {
 
     MaterialButton leaveButton, muteUnmuteButton;
     TextView memberName, groupNameTextView;
@@ -59,8 +85,69 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
 
     private LinkedHashMap<String, Boolean> memberHashMap;
     Handler handler = new Handler();
-    private InetAddress broadcastIp, myIp;
-    PeerDiscoveryManager discoveryManager;
+    private InetAddress broadcastIp;
+    private UDN udn = new UDN(UUID.randomUUID());
+    private AndroidUpnpService upnpService;
+    private LocalService<GroupMemberService> groupMemberLocalService =null;
+    private MemberRegistryListener registryListener = null;
+
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            upnpService = (AndroidUpnpService) service;
+
+            groupMemberLocalService = getGroupMemberService();
+
+            // Register the member when this activity binds to the service for the first time
+            if (groupMemberLocalService == null) {
+                try {
+                    LocalDevice groupMemberDevice = createDevice();
+                    Log.i(Constants.GROUP_DISCUSSION_PAGE_LOG_TAG, "Registering GroupMember...");
+                    upnpService.getRegistry().addDevice(groupMemberDevice);
+                    groupMemberLocalService = getGroupMemberService();
+                } catch (Exception ex) {
+                    Log.e(Constants.GROUP_DISCUSSION_PAGE_LOG_TAG, "Registering GroupMember failed"+ex);
+                    return;
+                }
+            }
+
+            // Start monitoring the group member changes in state
+            groupMemberLocalService.getManager().getImplementation().getPropertyChangeSupport().addPropertyChangeListener(GroupDiscussionPage.this);
+
+            registryListener = new MemberRegistryListener(new MemberRegistryListener.UiUpdateListener() {
+                @Override
+                public void onDeviceListUpdated(LinkedHashMap<String, Boolean> updatedHasMap) {
+                    memberHashMap = updatedHasMap;
+                    Log.i(Constants.GROUP_DISCUSSION_PAGE_LOG_TAG, "MemberHashMap :"+ memberHashMap.toString());
+
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            viewAdapter.updateData(memberHashMap);
+
+                        }
+                    });
+                }
+            });
+            // Get ready for future device advertisements
+            upnpService.getRegistry().addListener(registryListener);
+
+            // Search asynchronously for all devices, they will respond soon
+            upnpService.getControlPoint().search(new STAllHeader());
+            // Now add all devices to the list we already know about
+            for (Device device : upnpService.getRegistry().getDevices()) {
+                registryListener.deviceAdded(device);
+            }
+            Log.i(Constants.GROUP_DISCUSSION_PAGE_LOG_TAG, "Searching for GroupMembers...");
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            upnpService = null;
+            Log.i(Constants.GROUP_DISCUSSION_PAGE_LOG_TAG, "Service disconnected");
+        }
+    };
 
     AudioCallMulticast audioCall;
     CreateMeetingBroadcast createMeeting;
@@ -118,7 +205,6 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
 
         AddressGenerator addressGenerator = new AddressGenerator(view);
         broadcastIp = addressGenerator.getBroadcastIp();
-        myIp = addressGenerator.getIpAddress();
 
         // Set up the RecyclerView
         initiateRecyclerView(view);
@@ -127,6 +213,7 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
 
         leaveButton.setOnClickListener(leaveButtonClickEvent());
         muteUnmuteButton.setOnClickListener(muteUnmuteButtonClickEvent());
+        requireActivity().bindService(new Intent(this.getContext(), AndroidUpnpServiceImpl.class), serviceConnection, Context.BIND_AUTO_CREATE);
 
         return view;
     }
@@ -135,24 +222,7 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
         audioCall.startCall();
 
         //mDNS
-        discoveryManager = new PeerDiscoveryManager(new PeerDiscoveryManager.Listener() {
-            @Override
-            public void onDeviceListUpdated(LinkedHashMap<String, Boolean> updatedHasMap) {
-                memberHashMap = updatedHasMap;
-                Log.i(Constants.GROUP_DISCUSSION_PAGE_LOG_TAG, "MemberHashMap :"+ memberHashMap.toString());
-
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        viewAdapter.updateData(memberHashMap);
-
-                    }
-                });
-
-            }
-        }, myIp);
-        discoveryManager.registerService(name, isMute? "Y": "N");
-        discoveryManager.startDiscovery();
+        //implement peer discovery
 
         endMeeting = new EndMeetingMulticast( multicastGroupAddress);
         if(isAdmin){
@@ -179,9 +249,37 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
         }
 
         audioCall.endCall();
-        discoveryManager.unRegisterService(name);
+        dissembleConnections();
 
         endMeeting.stopListeningEndMeeting();
+    }
+
+
+
+    private void dissembleConnections(){
+
+        Log.i(Constants.GROUP_DISCUSSION_PAGE_LOG_TAG, "Dissembling connections");
+
+        // Stop monitoring
+        LocalService<GroupMemberService> groupMemberService = getGroupMemberService();
+        if (groupMemberService != null)
+            groupMemberService.getManager().getImplementation().getPropertyChangeSupport().removePropertyChangeListener(this);
+        if (upnpService != null) {
+            upnpService.getRegistry().removeListener(registryListener);
+        }
+
+        if(serviceConnection!=null)
+            requireActivity().unbindService(serviceConnection);
+
+//        upnpService.getRegistry().removeAllRemoteDevices();
+//        upnpService.getControlPoint().search();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        dissembleConnections();
     }
 
     public synchronized void updateMemberHashMap(String action, String nameValue, Boolean isMuteValue){
@@ -301,7 +399,8 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
                     audioCall.unmuteMeFromMeeting();
 
                 }
-                discoveryManager.toggleSound(name, isMute? "Y": "N");
+                //toggle sound
+                groupMemberLocalService.getManager().getImplementation().setMute(isMute);
             }
         };
     }
@@ -335,5 +434,48 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
     @Override
     public void onBackPressed() {
         leaveAlertDialog.show();
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+        if (event.getPropertyName().equals("isMute")) {
+            Object source = event.getSource();
+
+            if (source instanceof GroupMemberService) {
+                GroupMemberService service = (GroupMemberService) source;
+                Device device = service.getLocalService().getDevice();
+//                String memberName = device.getDetails().getFriendlyName();
+//
+//                memberHashMap.put(memberName, (Boolean) event.getNewValue());
+                Log.i(Constants.GROUP_DISCUSSION_PAGE_LOG_TAG," Property change: " );
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        viewAdapter.updateData(memberHashMap);
+
+                    }
+                });
+            }
+
+
+        }
+    }
+
+    protected LocalService<GroupMemberService> getGroupMemberService() {
+        if (upnpService == null) return null;
+        LocalDevice groupMemberDevice;
+        if ((groupMemberDevice = upnpService.getRegistry().getLocalDevice(udn, true)) == null)
+            return null;
+        return (LocalService<GroupMemberService>) groupMemberDevice.findService(new UDAServiceType("GroupMember", 1));
+    }
+
+    protected LocalDevice createDevice() throws LocalServiceBindingException, ValidationException {
+        Log.i(Constants.GROUP_DISCUSSION_PAGE_LOG_TAG, "Creating GroupMember Device...");
+
+        DeviceType type = new UDADeviceType("GroupMember", 1);
+        DeviceDetails details = new DeviceDetails(name);
+        LocalService service = new AnnotationLocalServiceBinder().read(GroupMemberService.class);
+        service.setManager(new DefaultServiceManager<>(service, GroupMemberService.class));
+        return new LocalDevice(new DeviceIdentity(udn), type, details, service);
     }
 }

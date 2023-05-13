@@ -6,6 +6,10 @@ android {
     namespace 'com.example.wifimeeting'
     compileSdk 33
 
+    packagingOptions {
+        exclude("META-INF/beans.xml")
+    }
+
     defaultConfig {
         applicationId "com.example.wifimeeting"
         minSdk 24
@@ -30,7 +34,15 @@ android {
 
 dependencies {
 
-    implementation 'org.jmdns:jmdns:3.5.8'
+    // Cling
+    implementation 'org.fourthline.cling:cling-core:2.1.0'
+    implementation 'org.fourthline.cling:cling-support:2.1.0'
+    //Other dependencies required by Cling
+    implementation 'org.eclipse.jetty:jetty-server:8.1.18.v20150929'
+    implementation 'org.eclipse.jetty:jetty-servlet:8.1.18.v20150929'
+    implementation 'org.eclipse.jetty:jetty-client:8.1.18.v20150929'
+    implementation 'org.slf4j:slf4j-jdk14:1.7.14'
+
     implementation 'com.google.code.gson:gson:2.8.9'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.8.0'
