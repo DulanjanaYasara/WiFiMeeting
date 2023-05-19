@@ -49,6 +49,7 @@ public class Constants {
 
     //Logging Tags
     public static final String LECTURE_SESSION_PAGE_LOG_TAG = "LectureSessionPage";
+    public static final String LECTURE_HOME_PAGE_LOG_TAG = "LectureHomePage";
     public static final String GROUP_DISCUSSION_PAGE_LOG_TAG = "GroupDiscussionPage";
     public static final String GROUP_DISCUSSION_LOBBY_PAGE_LOG_TAG = "GroupDiscussionLobbyPage";
     public static final String AUDIO_CALL_LOG_TAG = "AudioCall";

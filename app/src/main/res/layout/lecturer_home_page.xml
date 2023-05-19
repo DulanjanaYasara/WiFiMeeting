@@ -15,28 +15,12 @@
         />
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/port_text_input"
-        style="@style/Widget.WifiMeeting.TextInputLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:hint="@string/port">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/port_edit_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:maxLines="1" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/lecturer_name_text_input"
         style="@style/Widget.WifiMeeting.TextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/lecturer_name"
-        app:errorEnabled="true">
+        android:layout_marginTop="20dp"
+        android:hint="@string/lecturer_name">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/lecturer_name_edit_text"
@@ -45,12 +29,47 @@
             android:inputType="text" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/module_code_text_input"
+        style="@style/Widget.WifiMeeting.TextInputLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/module_code">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/module_code_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/multicast_group_address_text_input"
+        style="@style/Widget.WifiMeeting.TextInputLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/multicast_group_address"
+        app:errorEnabled="true"
+        app:endIconDrawable="@drawable/baseline_refresh_24"
+        app:endIconMode="custom"
+        app:endIconTint="@color/colorPrimaryDark"
+        app:endIconCheckable="true">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/multicast_group_address_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number|numberDecimal"
+            android:digits="0123456789."
+            android:maxLines="1" />
+    </com.google.android.material.textfield.TextInputLayout>
+
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/join_lecture_button"
+        android:id="@+id/start_lecture_button"
         style="@style/Widget.WifiMeeting.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:text="@string/join_lecture" />
+        android:text="@string/start_lecture" />
 
 </LinearLayout>

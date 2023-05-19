@@ -16,6 +16,7 @@
     <string name="cancel">Cancel</string>
     <string name="login">Login</string>
     <string name="join_lecture">Join Lecture</string>
+    <string name="start_lecture">Start Lecture</string>
     <string name="confirm">Confirm</string>
     <string name="leave_lecture_session_confirmation">Are you sure you want to leave lecture session?</string>
     <string name="leave_discussion_group_confirmation">Are you sure you want to leave discussion group?</string>
@@ -23,6 +24,7 @@
     <!--    Error Messages-->
     <string name="port_mandatory">Port is required</string>
     <string name="student_name_mandatory">Student name is required</string>
+    <string name="module_code_mandatory">Module Code is required</string>
     <string name="group_name_mandatory">Group name is required</string>
     <string name="group_mandatory">Group is required</string>
     <string name="members_mandatory">Members are required</string>
@@ -47,6 +49,7 @@
     <string name="port">Port</string>
     <string name="student_name">Student Name</string>
     <string name="lecturer_name">Lecturer Name</string>
+    <string name="module_code">Module Code</string>
     <string name="small_group_discussion">Small Group Discussion</string>
     <string name="group_name">Group Name</string>
     <string name="multicast_group_address">Multicast Group Address</string>
