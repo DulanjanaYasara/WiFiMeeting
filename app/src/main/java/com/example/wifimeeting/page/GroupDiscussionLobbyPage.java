@@ -49,6 +49,7 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
     private ArrayList<DiscussionGroupItem> groupDiscussionDetails = new ArrayList<DiscussionGroupItem>();
     ListGroupItemAdapter listGroupItemAdapter;
     CreateMeetingBroadcast createMeetingBroadcast;
+    GroupDiscussionDetailsUpdate groupDiscussionDetailsUpdate;
 
     @Override
     public View onCreateView(
@@ -84,10 +85,6 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
 
         initializeGroupDiscussion();
 
-        //GroupDiscussionDetails information update
-        Thread discussionDetailsUpdateThread = new Thread(new GroupDiscussionDetailsUpdate());
-        discussionDetailsUpdateThread.start();
-
         return view;
     }
 
@@ -101,10 +98,15 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
     }
 
     private void initializeGroupDiscussion(){
+        //GroupDiscussionDetails information update
+        groupDiscussionDetailsUpdate = new GroupDiscussionDetailsUpdate();
+        Thread discussionDetailsUpdateThread = new Thread(groupDiscussionDetailsUpdate);
+        discussionDetailsUpdateThread.start();
 
         //start the listening of the broadcast
         createMeetingBroadcast = new CreateMeetingBroadcast( broadcastIp);
         createMeetingBroadcast.listenCreateMeeting(this);
+
     }
 
     // Overriding onPause() method
@@ -128,14 +130,17 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
     public void onBackPressed() {
         if(createMeetingBroadcast !=null)
             createMeetingBroadcast.stopListeningCreateMeeting();
+        if(groupDiscussionDetailsUpdate!=null)
+            groupDiscussionDetailsUpdate.stop();
         requireFragmentManager().popBackStack();
     }
 
     private class GroupDiscussionDetailsUpdate implements Runnable{
+        private volatile boolean exit = false;
         @Override
         public void run() {
             try {
-                while(true){
+                while(!exit){
 
                     // check if any group discussions have timed out, if so remove them
                     long now = System.currentTimeMillis();
@@ -166,6 +171,10 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
             } catch (InterruptedException e) {
                 Log.e(Constants.GROUP_DISCUSSION_LOBBY_PAGE_LOG_TAG, "Update Group Discussion Details Failed!!! ");
             }
+        }
+
+        public void stop() {
+            exit = true;
         }
     }
 
@@ -247,6 +256,8 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
                         //stop listening
                         if (createMeetingBroadcast != null)
                             createMeetingBroadcast.stopListeningCreateMeeting();
+                        if(groupDiscussionDetailsUpdate!=null)
+                            groupDiscussionDetailsUpdate.stop();
 
                         Bundle bundle = new Bundle();
                         bundle.putString(GroupDiscussionMember.NAME.toString(), name);
@@ -293,6 +304,8 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
                     //stop listening
                     if(createMeetingBroadcast !=null)
                         createMeetingBroadcast.stopListeningCreateMeeting();
+                    if(groupDiscussionDetailsUpdate!=null)
+                        groupDiscussionDetailsUpdate.stop();
 
                     Bundle bundle = new Bundle();
                     bundle.putString(GroupDiscussionMember.NAME.toString(), name);
