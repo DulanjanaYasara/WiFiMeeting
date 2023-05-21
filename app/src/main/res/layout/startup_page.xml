@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/loginPageBackgroundColor"
@@ -10,24 +9,39 @@
     >
 
     <ImageView
-        android:layout_width="128dp"
-        android:layout_height="128dp"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="48dp"
-        android:layout_marginBottom="48dp"
-        app:srcCompat="@drawable/baseline_voice_chat_24"
-        app:tint="?android:attr/textColorPrimary" />
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        app:srcCompat="@drawable/login_image"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/startup_message"
-        android:textAppearance="@style/TextAppearance.WifiMeeting.Title" />
+        android:layout_gravity="center"
+        android:text="@string/app_name"
+        android:textAppearance="@style/TextAppearance.WifiMeeting.AppName" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/app_desc"
+        android:textAppearance="@style/TextAppearance.WifiMeeting.AppDesc" />
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="@string/startup_message"
+            android:textAppearance="@style/TextAppearance.WifiMeeting.AppAction"
+            android:layout_above="@id/student_button"
+            android:layout_marginBottom="10dp"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/lecturer_button"

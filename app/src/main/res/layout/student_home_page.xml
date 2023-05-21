@@ -8,28 +8,11 @@
     android:padding="@dimen/parent_page_padding">
 
     <com.google.android.material.textfield.TextInputLayout
-        style="@style/Widget.WifiMeeting.TextInputLayout"
-        android:id="@+id/port_text_input"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/topic_below_padding"
-        android:hint="@string/port">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/port_edit_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:maxLines="1" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/student_name_text_input"
         style="@style/Widget.WifiMeeting.TextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/student_name"
-        app:errorEnabled="true">
+        android:hint="@string/student_name">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/student_name_edit_text"
@@ -37,6 +20,26 @@
             android:layout_height="wrap_content"
             android:inputType="text" />
     </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/select_module_text_input"
+        style="@style/Widget.WifiMeeting.DropDownLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/select_module"
+        app:startIconDrawable="@drawable/baseline_local_library_24"
+        app:startIconTint="@color/textColorPrimary">
+
+        <AutoCompleteTextView
+            android:id="@+id/select_module"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/text_input_height"
+            android:enabled="true"
+            android:focusable="true"
+            android:inputType="none"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/join_lecture_button"
@@ -58,6 +61,6 @@
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:src="@drawable/student" />
+        android:src="@drawable/classroom" />
 
 </LinearLayout>

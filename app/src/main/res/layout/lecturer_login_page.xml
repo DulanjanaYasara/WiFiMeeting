@@ -7,12 +7,19 @@
     android:orientation="vertical"
     android:padding="@dimen/parent_page_padding">
 
+    <View
+        android:layout_weight="1"
+        android:layout_height="0dp"
+        android:layout_width="fill_parent"/>
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/username_text_input"
         style="@style/Widget.WifiMeeting.TextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/topic_below_padding"
+        app:startIconDrawable="@drawable/baseline_original_person_24"
+        app:startIconTint="@color/textColorPrimary"
         android:hint="@string/username">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -29,6 +36,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/password"
+        app:startIconDrawable="@drawable/baseline_lock_24"
+        app:startIconTint="@color/textColorPrimary"
         app:passwordToggleEnabled="true"
         app:errorEnabled="true">
 

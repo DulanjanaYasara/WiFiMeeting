@@ -10,10 +10,16 @@
         <item name="android:textColorPrimary">@color/textColorPrimary</item>
     </style>
 
+    <style name="TextAppearance.WifiMeeting.AppName" parent="TextAppearance.MaterialComponents.Headline4">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
 
-    <style name="TextAppearance.WifiMeeting.Title" parent="TextAppearance.MaterialComponents.Headline4">
-        <item name="textAllCaps">true</item>
-        <item name="android:textStyle">bold</item>
+    <style name="TextAppearance.WifiMeeting.AppDesc" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="android:textStyle">italic</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
+
+    <style name="TextAppearance.WifiMeeting.AppAction" parent="TextAppearance.MaterialComponents.Subtitle1">
         <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
