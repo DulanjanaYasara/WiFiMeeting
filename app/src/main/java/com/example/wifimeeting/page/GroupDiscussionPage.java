@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wifimeeting.R;
 import com.example.wifimeeting.components.membercard.MemberCardRecyclerViewAdapter;
+import com.example.wifimeeting.components.membercard.MemberCharacteristics;
 import com.example.wifimeeting.components.membercard.MemberGridItemDecoration;
 import com.example.wifimeeting.navigation.BackPressedListener;
 import com.example.wifimeeting.transmission.AudioCallMulticast;
@@ -26,6 +27,7 @@ import com.example.wifimeeting.transmission.EndMeetingMulticast;
 import com.example.wifimeeting.transmission.JoinMeetingMulticast;
 import com.example.wifimeeting.transmission.LeaveMeetingMulticast;
 import com.example.wifimeeting.transmission.MuteUnmuteMeetingMulticast;
+import com.example.wifimeeting.transmission.UpdateMembersMulticast;
 import com.example.wifimeeting.utils.BroadcastAddressGenerator;
 import com.example.wifimeeting.utils.Constants;
 import com.example.wifimeeting.utils.GroupDiscussionMember;
@@ -36,6 +38,7 @@ import com.google.android.material.snackbar.Snackbar;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class GroupDiscussionPage extends Fragment implements BackPressedListener{
 
@@ -58,7 +61,7 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
     private String role = null;
     private Boolean isMute;
 
-    private LinkedHashMap<String, Boolean> memberHashMap;
+    private LinkedHashMap<String, MemberCharacteristics> memberHashMap = new LinkedHashMap<>();
     Handler handler = new Handler();
     private InetAddress broadcastIp;
 
@@ -68,6 +71,10 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
     MuteUnmuteMeetingMulticast muteUnmuteMeeting;
     CreateMeetingBroadcast createMeeting;
     EndMeetingMulticast endMeeting;
+
+    UpdateMembersMulticast updateMembersMulticast;
+    JoinMemberRefresh joinMemberRefresh = null;
+    BroadcastAddressGenerator addressGenerator;
 
     public synchronized String getMemberHashMapSize(){
         return String.valueOf(memberHashMap.size());
@@ -110,6 +117,9 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         leaveMeeting(false);
+
+                        if(joinMemberRefresh!=null)
+                            joinMemberRefresh.stop();
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -119,7 +129,7 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
                     }
                 });
 
-        BroadcastAddressGenerator addressGenerator = new BroadcastAddressGenerator(view);
+        addressGenerator = new BroadcastAddressGenerator(view);
         broadcastIp = addressGenerator.getBroadcastIp();
 
         // Set up the RecyclerView
@@ -154,7 +164,80 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
     }
 
     private void explicitlyAddingFirstMember(){
-        memberHashMap.put(name, isMute);
+        memberHashMap.put(name, new MemberCharacteristics(isMute));
+        updateMembersMulticast = new UpdateMembersMulticast(this, multicastGroupAddress, addressGenerator.getIpAddress());
+    }
+
+    public synchronized void addMissedMembers(LinkedHashMap<String, Boolean> memberList) {
+        for(Map.Entry<String, Boolean> entry: memberList.entrySet()){
+            if(!memberHashMap.containsKey(entry.getKey())) {
+                memberHashMap.put(entry.getKey(), new MemberCharacteristics(entry.getValue()));
+
+                Log.i(Constants.GROUP_DISCUSSION_PAGE_LOG_TAG, "Adding the missed member :"+ entry.getKey());
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        viewAdapter.updateData(memberHashMap);
+
+                    }
+                });
+            }
+        }
+    }
+
+    private class JoinMemberRefresh implements Runnable{
+        private volatile boolean pause = false;
+        private volatile boolean exit = false;
+        @Override
+        public void run() {
+            try {
+                Log.i(Constants.GROUP_DISCUSSION_PAGE_LOG_TAG, "Starting JOIN meeting refresh thread...");
+                Long mostRecentLastMemberJoinTime = 0L;
+
+                while(!exit){
+
+                    while(!pause){
+                        Long now = System.currentTimeMillis();
+
+                        // Get the collection of values and iterate over them
+                        for (MemberCharacteristics characteristics: memberHashMap.values()) {
+                            if(characteristics.getLastMemberJoinTime() > mostRecentLastMemberJoinTime)
+                                mostRecentLastMemberJoinTime = characteristics.getLastMemberJoinTime();
+                        }
+
+                        if(now - mostRecentLastMemberJoinTime > Constants.JOIN_GROUP_DISCUSSION_REFRESH_TIMEOUT_MILLISECONDS) {
+
+                            LinkedHashMap<String, Boolean> members = new LinkedHashMap<>();
+                            for (Map.Entry<String, MemberCharacteristics> entry : memberHashMap.entrySet()) {
+                                members.put(entry.getKey(), entry.getValue().isMute());
+                            }
+                            Log.i(Constants.GROUP_DISCUSSION_PAGE_LOG_TAG, "Selected for multicasting member information");
+                            updateMembersMulticast.multicastUpdateMember(Constants.UPDATE_ACTION, members);
+
+                            pause = true;
+                        }
+
+                        Thread.sleep(Constants.GROUP_DISCUSSION_JOIN_UPDATE_INTERVAL);
+                    }
+
+                }
+
+            } catch (Exception ex) {
+                Log.e(Constants.GROUP_DISCUSSION_PAGE_LOG_TAG, "Join Members Refresh Failed!!! ");
+            }
+        }
+
+        public void stop() {
+            exit = true;
+        }
+
+        public boolean isPause() {
+            return pause;
+        }
+
+        public void setPause(boolean pause) {
+            this.pause = pause;
+        }
     }
 
     public synchronized void leaveMeeting(boolean isAdminTriggered){
@@ -176,6 +259,7 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
         leaveMeeting.stopListeningLeaveMeeting();
         muteUnmuteMeeting.stopListeningMuteUnmuteMeeting();
         endMeeting.stopListeningEndMeeting();
+        updateMembersMulticast.stopListeningUpdateMembers();
     }
 
     public synchronized boolean getCurrentIsMute(){
@@ -192,10 +276,23 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
 
                 if (memberHashMap.containsKey(nameValue)) {
                     Log.i(Constants.GROUP_DISCUSSION_PAGE_LOG_TAG, "Updating member: " + nameValue);
+                    MemberCharacteristics value = memberHashMap.get(nameValue);
+                    if(value!= null) value.setIsMute(isMuteValue);
                 } else {
                     Log.i(Constants.GROUP_DISCUSSION_PAGE_LOG_TAG, "Adding member: " + nameValue);
+                    memberHashMap.put(nameValue, new MemberCharacteristics(isMuteValue));
+
+                    if(joinMemberRefresh == null){
+                        //Members Details Information JOIN message packet loss rectifying
+                        joinMemberRefresh = new JoinMemberRefresh();
+                        Thread joinMemberRefreshThread = new Thread(joinMemberRefresh);
+                        joinMemberRefreshThread.start();
+                    } else {
+                        if(joinMemberRefresh.isPause())
+                            joinMemberRefresh.setPause(false);
+                    }
+
                 }
-                memberHashMap.put(nameValue, isMuteValue);
                 handler.post(new Runnable() {
                     @Override
                     public void run() {

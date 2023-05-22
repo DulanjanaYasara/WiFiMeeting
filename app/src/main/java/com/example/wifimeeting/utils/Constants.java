@@ -15,6 +15,9 @@ public class Constants {
     public static final int CLASSROOM_LECTURE_HEARTBEAT_INTERVAL = 5000; // 5 seconds
     public static final int CLASSROOM_LECTURE_DISCOVERY_TIMEOUT_MILLISECONDS = 15000;
     public static final int MUTE_UNMUTE_MULTICAST_TIMES = 2;
+    public static final int JOIN_MEETING_REFRESH_TIMEOUT_MILLISECONDS = 5000;
+    public static final int JOIN_MEMBER_REFRESH_MULTICAST_PERCENTAGE = 100;
+    public static final int CLASSROOM_LECTURE_JOIN_UPDATE_INTERVAL = 500;
 
     //Small Group Discussion Session
     public static final String GROUP_ADMIN_ROLE = "GroupAdmin";
@@ -22,6 +25,9 @@ public class Constants {
     public static final int GROUP_DISCUSSION_HEARTBEAT_INTERVAL = 5000; // 5 seconds
     public static final int GROUP_DISCUSSION_DISCOVERY_TIMEOUT_MILLISECONDS = 15000;
     public static final int SMALL_GROUP_DISCUSSION_MEMBER_MAX_COUNT = 2;
+
+    public static final int JOIN_GROUP_DISCUSSION_REFRESH_TIMEOUT_MILLISECONDS = 5000;
+    public static final int GROUP_DISCUSSION_JOIN_UPDATE_INTERVAL = 500;
 
 
     //    Lecturer Credentials
@@ -36,6 +42,7 @@ public class Constants {
     public static final String MUTE_ACTION = "MU";
     public static final String CREATE_ACTION = "CR";
     public static final String END_ACTION = "EN";
+    public static final String UPDATE_ACTION = "UP";
 
 
     //Port Allocation for Broadcast
@@ -47,6 +54,8 @@ public class Constants {
     public static final int MARK_ABSENCE_MULTICAST_PORT = 50002;
     public static final int MUTE_UNMUTE_MULTICAST_PORT = 50003;
     public static final int MARK_END_MULTICAST_PORT = 50005;
+    public static final int UPDATE_MEMBER_MULTICAST_PORT = 50006;
+
     //Audio Call configurations
     public static final int SAMPLE_RATE = 8000; // Hertz
     public static final int SAMPLE_INTERVAL = 20; // Milliseconds
@@ -66,8 +75,8 @@ public class Constants {
     public static final String MUTE_UNMUTE_LOG_TAG = "MuteUnmute";
     public static final String CREATE_MEETING_LOG_TAG = "CreateMeeting";
     public static final String END_MEETING_LOG_TAG = "EndMeeting";
+    public static final String UPDATE_MEMBERS = "UpdateMembers";
     public static final String ADDRESS_GENERATOR_LOG_TAG = "AddressGenerator";
-
 
 
 }

@@ -21,10 +21,10 @@ import java.util.Set;
  */
 public class MemberCardRecyclerViewAdapter extends RecyclerView.Adapter<MemberCardViewHolder> {
 
-    private LinkedHashMap<String, Boolean> memberList;
+    private LinkedHashMap<String, MemberCharacteristics> memberList;
     private View layoutView;
 
-    public MemberCardRecyclerViewAdapter(LinkedHashMap<String, Boolean> memberList) {
+    public MemberCardRecyclerViewAdapter(LinkedHashMap<String, MemberCharacteristics> memberList) {
         this.memberList = memberList;
     }
 
@@ -43,13 +43,13 @@ public class MemberCardRecyclerViewAdapter extends RecyclerView.Adapter<MemberCa
             Set<String> keySet = memberList.keySet();
             List<String> listKeys = new ArrayList<>(keySet);
             String key = listKeys.get(position);
-            Boolean value = memberList.get(key);
+            MemberCharacteristics value = memberList.get(key);
 
             holder.memberName.setText(key);
 
             //background color change based on mute unmute
             holder.materialCardViewLayout.setCardBackgroundColor(
-                    Boolean.TRUE.equals(value) ?
+                    Boolean.TRUE.equals(value.isMute()) ?
                             ContextCompat.getColor(layoutView.getContext(), R.color.toolbarIconColor):
                             ContextCompat.getColor(layoutView.getContext(), R.color.colorPrimary));
         }
@@ -61,7 +61,7 @@ public class MemberCardRecyclerViewAdapter extends RecyclerView.Adapter<MemberCa
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void updateData(LinkedHashMap<String, Boolean> newMemberList) {
+    public void updateData(LinkedHashMap<String, MemberCharacteristics> newMemberList) {
         memberList = newMemberList;
 
         // notify the adapter that the data has changed
