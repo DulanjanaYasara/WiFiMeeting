@@ -128,13 +128,16 @@ public class LectureSessionPage extends Fragment implements BackPressedListener{
     }
 
     private void initializeMeeting(){
+        boolean isAdmin = role.equals(Constants.LECTURER_ROLE);
+
         audioCall.startCall();
-        joinMeeting = new JoinMeetingMulticast(this,  name, isMute, multicastGroupAddress);
+        joinMeeting = new JoinMeetingMulticast(this,  name, isMute, multicastGroupAddress, isAdmin);
+        explicitlyAddingFirstMember();
         leaveMeeting = new LeaveMeetingMulticast(this, multicastGroupAddress);
         muteUnmuteMeeting = new MuteUnmuteMeetingMulticast(this, multicastGroupAddress);
 
         endMeeting = new EndMeetingMulticast( multicastGroupAddress);
-        if(role.equals(Constants.LECTURER_ROLE)){
+        if(isAdmin){
             //broadcasting 'create meeting'
             createMeeting = new CreateMeetingBroadcast(broadcastIp);
             createMeeting.broadcastCreate(this, Constants.CREATE_ACTION, moduleName, multicastGroupAddress.getHostAddress());
@@ -142,7 +145,10 @@ public class LectureSessionPage extends Fragment implements BackPressedListener{
             //listening 'end meeting'
             endMeeting.listenEndMeeting(this);
         }
+    }
 
+    private void explicitlyAddingFirstMember(){
+        memberHashMap.put(name, isMute);
     }
 
     public synchronized void leaveMeeting(boolean isAdminTriggered){

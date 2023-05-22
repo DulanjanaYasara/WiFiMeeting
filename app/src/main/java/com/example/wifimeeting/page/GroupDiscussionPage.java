@@ -134,13 +134,16 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
     }
 
     private void initializeMeeting(){
+        boolean isAdmin = Constants.GROUP_ADMIN_ROLE.toString().equals(role);
+
         audioCall.startCall();
-        joinMeeting = new JoinMeetingMulticast(this,  name, isMute, multicastGroupAddress);
+        joinMeeting = new JoinMeetingMulticast(this,  name, isMute, multicastGroupAddress, isAdmin);
+        explicitlyAddingFirstMember();
         leaveMeeting = new LeaveMeetingMulticast(this,  multicastGroupAddress);
         muteUnmuteMeeting = new MuteUnmuteMeetingMulticast(this, multicastGroupAddress);
 
         endMeeting = new EndMeetingMulticast( multicastGroupAddress);
-        if(Constants.GROUP_ADMIN_ROLE.toString().equals(role)){
+        if(isAdmin){
             //broadcasting 'create meeting'
             createMeeting = new CreateMeetingBroadcast( broadcastIp);
             createMeeting.broadcastCreate(this, Constants.CREATE_ACTION, groupName, multicastGroupAddress.getHostAddress());
@@ -148,6 +151,10 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
             //listening 'end meeting'
             endMeeting.listenEndMeeting(this);
         }
+    }
+
+    private void explicitlyAddingFirstMember(){
+        memberHashMap.put(name, isMute);
     }
 
     public synchronized void leaveMeeting(boolean isAdminTriggered){

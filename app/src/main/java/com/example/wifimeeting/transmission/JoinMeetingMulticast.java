@@ -21,14 +21,15 @@ public class JoinMeetingMulticast {
     private String name;
     private Boolean isMute;
 
-    public JoinMeetingMulticast(Object uiPage, String name, Boolean isMute, InetAddress multicastIP) {
+    public JoinMeetingMulticast(Object uiPage, String name, Boolean isMute, InetAddress multicastIP, boolean isAdmin) {
         this.uiPage = uiPage;
         this.multicastIP = multicastIP;
         this.name = name;
         this.isMute = isMute;
 
         listenJoinMeeting();
-        multicastJoinPresent(Constants.JOIN_ACTION, name, isMute);
+        if(!isAdmin)
+            multicastJoinPresent(Constants.JOIN_ACTION, name, isMute);
     }
 
     /**
