@@ -20,13 +20,13 @@ import com.example.wifimeeting.R;
 import com.example.wifimeeting.components.membercard.MemberCardRecyclerViewAdapter;
 import com.example.wifimeeting.components.membercard.MemberGridItemDecoration;
 import com.example.wifimeeting.navigation.BackPressedListener;
-import com.example.wifimeeting.usecase.smallgroupdiscussion.AudioCallMulticast;
-import com.example.wifimeeting.usecase.smallgroupdiscussion.CreateMeetingBroadcast;
-import com.example.wifimeeting.usecase.smallgroupdiscussion.EndMeetingMulticast;
-import com.example.wifimeeting.usecase.smallgroupdiscussion.JoinMeetingMulticast;
-import com.example.wifimeeting.usecase.smallgroupdiscussion.LeaveMeetingMulticast;
-import com.example.wifimeeting.usecase.smallgroupdiscussion.MuteUnmuteMeetingMulticast;
-import com.example.wifimeeting.utils.AddressGenerator;
+import com.example.wifimeeting.transmission.AudioCallMulticast;
+import com.example.wifimeeting.transmission.CreateMeetingBroadcast;
+import com.example.wifimeeting.transmission.EndMeetingMulticast;
+import com.example.wifimeeting.transmission.JoinMeetingMulticast;
+import com.example.wifimeeting.transmission.LeaveMeetingMulticast;
+import com.example.wifimeeting.transmission.MuteUnmuteMeetingMulticast;
+import com.example.wifimeeting.utils.BroadcastAddressGenerator;
 import com.example.wifimeeting.utils.Constants;
 import com.example.wifimeeting.utils.GroupDiscussionMember;
 import com.google.android.material.button.MaterialButton;
@@ -53,11 +53,10 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
      * My Details
      */
     private String name = null;
-    private Boolean isMute = true;
     private String groupName= null;
-    private Boolean isAdmin = false;
-    private int port;
     private InetAddress multicastGroupAddress;
+    private String role = null;
+    private Boolean isMute;
 
     private LinkedHashMap<String, Boolean> memberHashMap;
     Handler handler = new Handler();
@@ -70,7 +69,7 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
     CreateMeetingBroadcast createMeeting;
     EndMeetingMulticast endMeeting;
 
-    public String getMemberHashMapSize(){
+    public synchronized String getMemberHashMapSize(){
         return String.valueOf(memberHashMap.size());
     }
 
@@ -78,7 +77,7 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.group_discussion_page, container, false);
+        View view = inflater.inflate(R.layout.meeting_page, container, false);
         leaveButton = view.findViewById(R.id.leave_button);
         muteUnmuteButton = view.findViewById(R.id.mute_unmute_button);
         memberName = view.findViewById(R.id.member_name);
@@ -90,16 +89,16 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
         if(this.getArguments() != null){
             Bundle bundle = this.getArguments();
             name = bundle.getString(GroupDiscussionMember.NAME.toString());
-            isMute = bundle.getBoolean(GroupDiscussionMember.IS_MUTE.toString());
             groupName = bundle.getString(GroupDiscussionMember.GROUP_NAME.toString());
-            isAdmin = bundle.getBoolean(GroupDiscussionMember.IS_ADMIN.toString());
-            port = bundle.getInt(GroupDiscussionMember.PORT.toString());
+            role = bundle.getString(GroupDiscussionMember.ROLE.toString());
+
             try {
                 multicastGroupAddress = InetAddress.getByName(bundle.getString(GroupDiscussionMember.MULTICAST_GROUP_ADDRESS.toString()));
             } catch (UnknownHostException e) {
                 Log.e(Constants.GROUP_DISCUSSION_PAGE_LOG_TAG, "Error in retrieving Multicast Group Address!");
             }
 
+            isMute = Constants.NON_ADMIN_ROLE.toString().equals(role);
             readyUiView();
         }
 
@@ -120,12 +119,12 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
                     }
                 });
 
-        AddressGenerator addressGenerator = new AddressGenerator(view);
+        BroadcastAddressGenerator addressGenerator = new BroadcastAddressGenerator(view);
         broadcastIp = addressGenerator.getBroadcastIp();
 
         // Set up the RecyclerView
         initiateRecyclerView(view);
-        audioCall = new AudioCallMulticast(addressGenerator.getIpAddress(), multicastGroupAddress, isMute, port);
+        audioCall = new AudioCallMulticast(addressGenerator.getIpAddress(), multicastGroupAddress, isMute);
         initializeMeeting();
 
         leaveButton.setOnClickListener(leaveButtonClickEvent());
@@ -141,7 +140,7 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
         muteUnmuteMeeting = new MuteUnmuteMeetingMulticast(this, multicastGroupAddress);
 
         endMeeting = new EndMeetingMulticast( multicastGroupAddress);
-        if(isAdmin){
+        if(Constants.GROUP_ADMIN_ROLE.toString().equals(role)){
             //broadcasting 'create meeting'
             createMeeting = new CreateMeetingBroadcast( broadcastIp);
             createMeeting.broadcastCreate(this, Constants.CREATE_ACTION, groupName, multicastGroupAddress.getHostAddress());
@@ -151,7 +150,7 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
         }
     }
 
-    public void leaveMeeting(boolean isAdminTriggered){
+    public synchronized void leaveMeeting(boolean isAdminTriggered){
 
         requireFragmentManager().popBackStack();
         if(isAdminTriggered){
@@ -159,7 +158,7 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
         }
 
         //if admin leaves then multicast all members have to leave
-        if(isAdmin){
+        if(Constants.GROUP_ADMIN_ROLE.toString().equals(role)){
             endMeeting.multicastEndMeeting(Constants.END_ACTION);
             createMeeting.stopBroadcasting();
         }
@@ -254,7 +253,9 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
             memberName.setText(name);
         if(groupName!=null)
             groupNameTextView.setText(groupName);
-        memberImageView.setImageResource(isAdmin? R.drawable.baseline_manage_accounts_24: R.drawable.baseline_person_24);
+        memberImageView.setImageResource(Constants.GROUP_ADMIN_ROLE.toString().equals(role)?
+                R.drawable.baseline_manage_accounts_24:
+                R.drawable.baseline_person_24);
 
         if(isMute){
                 muteUnmuteButton.setText(R.string.unmute);

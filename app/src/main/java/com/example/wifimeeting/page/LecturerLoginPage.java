@@ -65,7 +65,7 @@ public class LecturerLoginPage extends Fragment {
 
                 if (usernameTextInput.getError() == null && passwordTextInput.getError() == null) {
                     if(isPasswordAuthenticated(usernameEditText.getText().toString().trim(), passwordEditText.getText().toString()))
-                        ((NavigationHost) getActivity()).navigateTo(new LectureHomePage(), true);
+                        ((NavigationHost) getActivity()).navigateTo(new LecturerHomePage(), true);
                     else
                         Snackbar.make(view, R.string.login_failed, Snackbar.LENGTH_SHORT).show();
                 }

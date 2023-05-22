@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,23 +20,29 @@ import com.example.wifimeeting.R;
 import com.example.wifimeeting.components.membercard.MemberCardRecyclerViewAdapter;
 import com.example.wifimeeting.components.membercard.MemberGridItemDecoration;
 import com.example.wifimeeting.navigation.BackPressedListener;
-import com.example.wifimeeting.usecase.bigclassroomlecturesession.AudioCallBroadcast;
-import com.example.wifimeeting.usecase.bigclassroomlecturesession.JoinMeetingBroadcast;
-import com.example.wifimeeting.usecase.bigclassroomlecturesession.LeaveMeetingBroadcast;
-import com.example.wifimeeting.usecase.bigclassroomlecturesession.MuteUnmuteMeetingBroadcast;
-import com.example.wifimeeting.utils.AddressGenerator;
+import com.example.wifimeeting.transmission.AudioCallMulticast;
+import com.example.wifimeeting.transmission.CreateMeetingBroadcast;
+import com.example.wifimeeting.transmission.EndMeetingMulticast;
+import com.example.wifimeeting.transmission.JoinMeetingMulticast;
+import com.example.wifimeeting.transmission.LeaveMeetingMulticast;
+import com.example.wifimeeting.transmission.MuteUnmuteMeetingMulticast;
+import com.example.wifimeeting.utils.BroadcastAddressGenerator;
 import com.example.wifimeeting.utils.Constants;
+import com.example.wifimeeting.utils.GroupDiscussionMember;
 import com.example.wifimeeting.utils.LectureSessionMember;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.LinkedHashMap;
 
 public class LectureSessionPage extends Fragment implements BackPressedListener{
 
     MaterialButton leaveButton, muteUnmuteButton;
-    TextView memberName;
+    TextView memberName, moduleNameTextView;
+    ImageView moduleImageView;
     MaterialAlertDialogBuilder leaveAlertDialog;
     MemberCardRecyclerViewAdapter viewAdapter;
     RecyclerView recyclerView;
@@ -47,33 +54,45 @@ public class LectureSessionPage extends Fragment implements BackPressedListener{
      * My Details
      */
     private String name = null;
-    private Boolean isMute = true;
-    private int port;
+    private String role = null;
+    private String moduleName= null;
+    private InetAddress multicastGroupAddress;
+    private Boolean isMute;
 
     private LinkedHashMap<String, Boolean> memberHashMap = new LinkedHashMap<>();
     Handler handler = new Handler();
     private InetAddress broadcastIp;
 
-    AudioCallBroadcast audioCall;
-    JoinMeetingBroadcast joinMeeting;
-    LeaveMeetingBroadcast leaveMeeting;
-    MuteUnmuteMeetingBroadcast muteUnmuteMeeting;
+    AudioCallMulticast audioCall;
+    JoinMeetingMulticast joinMeeting;
+    LeaveMeetingMulticast leaveMeeting;
+    CreateMeetingBroadcast createMeeting;
+    MuteUnmuteMeetingMulticast muteUnmuteMeeting;
+    EndMeetingMulticast endMeeting;
 
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.lecture_session_page, container, false);
+        View view = inflater.inflate(R.layout.meeting_page, container, false);
         leaveButton = view.findViewById(R.id.leave_button);
         muteUnmuteButton = view.findViewById(R.id.mute_unmute_button);
         memberName = view.findViewById(R.id.member_name);
+        moduleNameTextView =  view.findViewById(R.id.group_name);
+        moduleImageView = view.findViewById(R.id.groupImage);
 
         if(this.getArguments() != null){
             Bundle bundle = this.getArguments();
             name = bundle.getString(LectureSessionMember.NAME.toString());
-            isMute = bundle.getBoolean(LectureSessionMember.IS_MUTE.toString());
-            port = bundle.getInt(LectureSessionMember.PORT.toString());
+            role = bundle.getString(LectureSessionMember.ROLE.toString());
+            moduleName = bundle.getString(LectureSessionMember.MODULE_CODE.toString());
+            try {
+                multicastGroupAddress = InetAddress.getByName(bundle.getString(GroupDiscussionMember.MULTICAST_GROUP_ADDRESS.toString()));
+            } catch (UnknownHostException e) {
+                Log.e(Constants.GROUP_DISCUSSION_PAGE_LOG_TAG, "Error in retrieving Multicast Group Address!");
+            }
 
+            isMute = Constants.STUDENT_ROLE.toString().equals(role);
             readyUiView();
         }
 
@@ -84,8 +103,7 @@ public class LectureSessionPage extends Fragment implements BackPressedListener{
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        requireFragmentManager().popBackStack();
-                        leaveMeeting();
+                        leaveMeeting(false);
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -95,12 +113,12 @@ public class LectureSessionPage extends Fragment implements BackPressedListener{
                     }
                 });
 
-        AddressGenerator addressGenerator = new AddressGenerator(view);
+        BroadcastAddressGenerator addressGenerator = new BroadcastAddressGenerator(view);
         broadcastIp = addressGenerator.getBroadcastIp();
 
         // Set up the RecyclerView
         initiateRecyclerView(view);
-        audioCall = new AudioCallBroadcast(addressGenerator.getIpAddress(), broadcastIp, isMute, port);
+        audioCall = new AudioCallMulticast(addressGenerator.getIpAddress(), multicastGroupAddress, isMute);
         initializeMeeting();
 
         leaveButton.setOnClickListener(leaveButtonClickEvent());
@@ -111,19 +129,41 @@ public class LectureSessionPage extends Fragment implements BackPressedListener{
 
     private void initializeMeeting(){
         audioCall.startCall();
-        joinMeeting = new JoinMeetingBroadcast(this,  name, isMute, broadcastIp);
-        leaveMeeting = new LeaveMeetingBroadcast(this,  broadcastIp);
-        muteUnmuteMeeting = new MuteUnmuteMeetingBroadcast(this, broadcastIp);
+        joinMeeting = new JoinMeetingMulticast(this,  name, isMute, multicastGroupAddress);
+        leaveMeeting = new LeaveMeetingMulticast(this, multicastGroupAddress);
+        muteUnmuteMeeting = new MuteUnmuteMeetingMulticast(this, multicastGroupAddress);
+
+        endMeeting = new EndMeetingMulticast( multicastGroupAddress);
+        if(role.equals(Constants.LECTURER_ROLE)){
+            //broadcasting 'create meeting'
+            createMeeting = new CreateMeetingBroadcast(broadcastIp);
+            createMeeting.broadcastCreate(this, Constants.CREATE_ACTION, moduleName, multicastGroupAddress.getHostAddress());
+        } else {
+            //listening 'end meeting'
+            endMeeting.listenEndMeeting(this);
+        }
 
     }
 
-    private void leaveMeeting(){
+    public synchronized void leaveMeeting(boolean isAdminTriggered){
+
+        requireFragmentManager().popBackStack();
+        if(isAdminTriggered){
+            Snackbar.make(this.requireView(), R.string.lecture_session_ended, Snackbar.LENGTH_SHORT).show();
+        }
+
+        //if admin leaves then multicast all members have to leave
+        if(role.equals(Constants.LECTURER_ROLE)){
+            endMeeting.multicastEndMeeting(Constants.END_ACTION);
+            createMeeting.stopBroadcasting();
+        }
+
         audioCall.endCall();
-        leaveMeeting.broadcastLeaveAbsent(Constants.LEAVE_ACTION,name);
+        leaveMeeting.multicastLeaveAbsent(Constants.LEAVE_ACTION,name);
         joinMeeting.stopListeningJoinMeeting();
         leaveMeeting.stopListeningLeaveMeeting();
         muteUnmuteMeeting.stopListeningMuteUnmuteMeeting();
-
+        endMeeting.stopListeningEndMeeting();
     }
 
     public synchronized void updateMemberHashMap(String action, String nameValue, Boolean isMuteValue){
@@ -191,6 +231,10 @@ public class LectureSessionPage extends Fragment implements BackPressedListener{
     private void readyUiView (){
         if(name!= null)
             memberName.setText(name);
+        if(moduleName!= null)
+            moduleNameTextView.setText(moduleName);
+        moduleImageView.setImageResource(R.drawable.baseline_local_library_24);
+
         if(isMute){
             muteUnmuteButton.setText( R.string.unmute);
             muteUnmuteButton.setIcon(getResources().getDrawable(R.drawable.baseline_mic_24));
@@ -225,7 +269,7 @@ public class LectureSessionPage extends Fragment implements BackPressedListener{
                     audioCall.unmuteMeFromMeeting();
 
                 }
-                muteUnmuteMeeting.broadcastMuteUnmute(Constants.MUTE_ACTION,name, isMute);
+                muteUnmuteMeeting.multicastMuteUnmute(Constants.MUTE_ACTION,name, isMute);
             }
         };
     }

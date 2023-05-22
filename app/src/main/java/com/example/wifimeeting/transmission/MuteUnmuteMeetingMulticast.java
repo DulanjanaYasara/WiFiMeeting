@@ -1,53 +1,55 @@
-package com.example.wifimeeting.usecase.bigclassroomlecturesession;
+package com.example.wifimeeting.transmission;
 
 import android.util.Log;
 
+import com.example.wifimeeting.page.GroupDiscussionPage;
 import com.example.wifimeeting.page.LectureSessionPage;
 import com.example.wifimeeting.utils.Constants;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.MulticastSocket;
 import java.net.SocketTimeoutException;
 
-public class MuteUnmuteMeetingBroadcast {
+public class MuteUnmuteMeetingMulticast {
 
     private boolean LISTEN_MUTE_MEETING = true;
-    private LectureSessionPage uiPage;
-    private InetAddress broadcastIP;
+    private Object uiPage;
+    private InetAddress multicastIP;
 
-    public MuteUnmuteMeetingBroadcast(LectureSessionPage uiPage, InetAddress broadcastIP) {
+    public MuteUnmuteMeetingMulticast(Object uiPage, InetAddress multicastIP) {
         this.uiPage = uiPage;
-        this.broadcastIP = broadcastIP;
+        this.multicastIP = multicastIP;
 
         listenMuteUnmuteMeeting();
     }
 
     /**
-     * Broadcast the MUTE action
+     * Multicast the MUTE action
      */
-    public void broadcastMuteUnmute(String action, final String name,final Boolean isMute) {
+    public void multicastMuteUnmute(String action, final String name, final Boolean isMute) {
 
-        Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "Broadcasting MUTE UNMUTE Action started!");
-        Thread broadcastThread = new Thread(new Runnable() {
+        Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "Multicasting MUTE UNMUTE Action started!");
+        Thread multicastThread = new Thread(new Runnable() {
 
             @Override
             public void run() {
 
-                DatagramSocket socket = null;
+                MulticastSocket socket = null;
                 try {
                     String request = action + name + (isMute ? "1" : "0");
                     byte[] message = request.getBytes();
-                    socket = new DatagramSocket();
-                    socket.setBroadcast(true);
-                    DatagramPacket packet = new DatagramPacket(message, message.length, broadcastIP, Constants.MUTE_UNMUTE_BROADCAST_PORT);
+                    socket = new MulticastSocket();
+
+                    DatagramPacket packet = new DatagramPacket(message, message.length, multicastIP, Constants.MUTE_UNMUTE_MULTICAST_PORT);
                     socket.send(packet);
-                    Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "MUTE UNMUTE Action Broadcast packet sent: " + packet.getAddress().toString());
+                    Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "MUTE UNMUTE Action Multicast packet sent: " + packet.getAddress().toString());
 
                 } catch (Exception e) {
-                    Log.e(Constants.MUTE_UNMUTE_LOG_TAG, "Exception in MUTE UNMUTE Action broadcast: " + e);
-                    Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "MUTE UNMUTE Action Broadcaster ending!");
+                    Log.e(Constants.MUTE_UNMUTE_LOG_TAG, "Exception in MUTE UNMUTE Action multicast: " + e);
+                    Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "MUTE UNMUTE Action Multicasting ending!");
 
                 } finally {
                     if(socket!=null){
@@ -57,7 +59,7 @@ public class MuteUnmuteMeetingBroadcast {
                 }
             }
         });
-        broadcastThread.start();
+        multicastThread.start();
     }
 
 
@@ -73,37 +75,45 @@ public class MuteUnmuteMeetingBroadcast {
             @Override
             public void run() {
 
-                DatagramSocket socket = null;
+                MulticastSocket socket = null;
                 try {
-                    socket = new DatagramSocket(null);
+                    socket = new MulticastSocket(null);
                     socket.setReuseAddress(true);
-                    socket.bind(new InetSocketAddress(Constants.MUTE_UNMUTE_BROADCAST_PORT));
+                    socket.bind(new InetSocketAddress(Constants.MUTE_UNMUTE_MULTICAST_PORT));
+                    socket.joinGroup(multicastIP);
+
+                    byte[] buffer = new byte[Constants.MULTICAST_BUF_SIZE];
+                    while (LISTEN_MUTE_MEETING) {
+                        listen(socket, buffer);
+                    }
+
+                    Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "Listener for mute unmute meeting ending!");
+                    socket.leaveGroup(multicastIP);
+                    socket.disconnect();
+                    socket.close();
                 } catch (Exception e) {
                     Log.e(Constants.MUTE_UNMUTE_LOG_TAG, "Exception in listener for mute unmute meeting: " + e);
                     if(socket!=null){
+                        try {
+                            socket.leaveGroup(multicastIP);
+                        } catch (IOException ex) {
+                            Log.e(Constants.JOIN_MEETING_LOG_TAG, "Exception in listener for leaving the multicast group: " + e);
+                        }
                         socket.disconnect();
                         socket.close();
                     }
                     return;
                 }
-                byte[] buffer = new byte[Constants.BROADCAST_BUF_SIZE];
-                while (LISTEN_MUTE_MEETING) {
-                    listen(socket, buffer);
-                }
-
-                Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "Listener for mute unmute meeting ending!");
-                socket.disconnect();
-                socket.close();
             }
 
             //Listen in for new notifications
-            public void listen(DatagramSocket socket, byte[] buffer) {
+            public void listen(MulticastSocket socket, byte[] buffer) {
 
                 try {
 
                     Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "Listening for a mute unmute meeting packet!");
 
-                    DatagramPacket packet = new DatagramPacket(buffer, Constants.BROADCAST_BUF_SIZE);
+                    DatagramPacket packet = new DatagramPacket(buffer, Constants.MULTICAST_BUF_SIZE);
                     socket.setSoTimeout(15000);
                     socket.receive(packet);
                     String data = new String(buffer, 0, packet.getLength());
@@ -113,9 +123,13 @@ public class MuteUnmuteMeetingBroadcast {
                     String receiverName = data.substring(2, data.length() - 1);
                     Boolean isMuteValue = data.endsWith("1");
 
-                    if (receivedAction.equals(Constants.MUTE_ACTION)) {
+                    if (receivedAction.equals(Constants.MUTE_ACTION) && uiPage instanceof GroupDiscussionPage) {
                         Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "Mute unmute Meeting Listener received MUTE request");
-                        uiPage.updateMemberHashMap(receivedAction, receiverName, isMuteValue);
+                        ((GroupDiscussionPage) uiPage).updateMemberHashMap(receivedAction, receiverName, isMuteValue);
+
+                    } else if (receivedAction.equals(Constants.MUTE_ACTION) && uiPage instanceof LectureSessionPage) {
+                        Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "Mute unmute Meeting Listener received MUTE request");
+                        ((LectureSessionPage) uiPage).updateMemberHashMap(receivedAction, receiverName, isMuteValue);
 
                     } else {
                         Log.w(Constants.MUTE_UNMUTE_LOG_TAG, "Mute unmute Meeting Listener received invalid request: " + receivedAction);

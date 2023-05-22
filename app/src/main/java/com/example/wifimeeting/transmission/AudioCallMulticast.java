@@ -1,4 +1,4 @@
-package com.example.wifimeeting.usecase.smallgroupdiscussion;
+package com.example.wifimeeting.transmission;
 
 import android.media.AudioFormat;
 import android.media.AudioManager;
@@ -24,13 +24,11 @@ public class AudioCallMulticast {
     private boolean mic = false; // Enable mic?
     private boolean speakers = false; // Enable speakers?
     private Boolean isMute;
-    private int audioCallPort;
 
-    public AudioCallMulticast(InetAddress myAddress, InetAddress multicastIP, Boolean isMute, int audioCallPort) {
+    public AudioCallMulticast(InetAddress myAddress, InetAddress multicastIP, Boolean isMute) {
         this.myAddress = myAddress;
         this.isMute = isMute;
         this.multicastIP = multicastIP;
-        this.audioCallPort = audioCallPort;
     }
 
     public void startCall() {
@@ -105,7 +103,7 @@ public class AudioCallMulticast {
 
                     while (mic) {
                         bytes_read = audioRecorder.read(buf, 0, BUF_SIZE);
-                        DatagramPacket packet = new DatagramPacket(buf, bytes_read, multicastIP, audioCallPort);
+                        DatagramPacket packet = new DatagramPacket(buf, bytes_read, multicastIP, Constants.DEFAULT_AUDIO_CALL_PORT);
                         socket.send(packet);
                         bytes_sent += bytes_read;
                         Log.i(Constants.AUDIO_CALL_LOG_TAG, "Total bytes sent: " + bytes_sent);
@@ -154,7 +152,7 @@ public class AudioCallMulticast {
 
                         socket = new MulticastSocket(null);
                         socket.setReuseAddress(true);
-                        socket.bind(new InetSocketAddress(audioCallPort));
+                        socket.bind(new InetSocketAddress(Constants.DEFAULT_AUDIO_CALL_PORT));
                         socket.joinGroup(multicastIP);
 
                         byte[] buf = new byte[BUF_SIZE];

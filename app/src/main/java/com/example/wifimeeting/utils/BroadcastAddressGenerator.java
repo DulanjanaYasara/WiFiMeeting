@@ -8,12 +8,12 @@ import android.view.View;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-public class AddressGenerator {
+public class BroadcastAddressGenerator {
 
     private InetAddress broadcastIp;
     private InetAddress ipAddress;
 
-    public AddressGenerator(View view) {
+    public BroadcastAddressGenerator(View view) {
         generateAddress(view);
     }
 
@@ -25,7 +25,7 @@ public class AddressGenerator {
         return broadcastIp;
     }
 
-    public void generateAddress(View view){
+    private void generateAddress(View view){
         try{
             WifiManager wifiManager = (WifiManager) view.getContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             wifiManager.setWifiEnabled(true);
@@ -36,7 +36,7 @@ public class AddressGenerator {
             ipAddress = InetAddress.getByName(ipAddressString);
 
         } catch(UnknownHostException e) {
-            Log.e(Constants.JOIN_MEETING_LOG_TAG,"UnknownHostException in get IP address: " + e);
+            Log.e(Constants.ADDRESS_GENERATOR_LOG_TAG,"UnknownHostException in get IP address: " + e);
         }
     }
 

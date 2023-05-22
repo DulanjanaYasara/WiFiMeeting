@@ -2,7 +2,6 @@ package com.example.wifimeeting.page;
 
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,17 +14,15 @@ import com.example.wifimeeting.R;
 import com.example.wifimeeting.navigation.NavigationHost;
 import com.example.wifimeeting.utils.Constants;
 import com.example.wifimeeting.utils.LectureSessionMember;
+import com.example.wifimeeting.utils.MulticastAddressGenerator;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.net.InetAddress;
-import java.net.MulticastSocket;
 import java.util.Objects;
-import java.util.Random;
 
-public class LectureHomePage extends Fragment {
+public class LecturerHomePage extends Fragment {
 
     MaterialButton startLectureButton;
     TextInputLayout moduleCodeTextInput, lecturerNameTextInput, multicastGroupTextInput;
@@ -45,7 +42,8 @@ public class LectureHomePage extends Fragment {
         multicastGroupTextInput = view.findViewById(R.id.multicast_group_address_text_input);
         multicastGroupEditText = view.findViewById(R.id.multicast_group_address_edit_text);
 
-        multicastGroupEditText.setText(generateMulticastAddress());
+        multicastGroupEditText.setText(MulticastAddressGenerator.generateMulticastAddress());
+
         startLectureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -59,15 +57,16 @@ public class LectureHomePage extends Fragment {
 
                         //multicast group address validations
                         String multicastGroupAddress = multicastGroupEditText.getText().toString().trim();
-                        if(!validateMulticastGroupAddress(multicastGroupAddress)){
+                        if(!MulticastAddressGenerator.validateMulticastGroupAddress(multicastGroupAddress)){
                             Snackbar.make(view, R.string.multicast_group_address_validation_error, Snackbar.LENGTH_SHORT).show();
                             return;
                         }
 
                         Bundle bundle = new Bundle();
                         bundle.putString(LectureSessionMember.NAME.toString(), Objects.requireNonNull(lecturerNameEditText.getText()).toString().trim());
-                        bundle.putBoolean(LectureSessionMember.IS_MUTE.toString(), false);
-                        bundle.putInt(LectureSessionMember.PORT.toString(), Integer.parseInt(moduleCodeEditText.getText().toString()));
+                        bundle.putString(LectureSessionMember.ROLE.toString(), Constants.LECTURER_ROLE);
+                        bundle.putString(LectureSessionMember.MODULE_CODE.toString(), Objects.requireNonNull(moduleCodeEditText.getText()).toString().trim());
+                        bundle.putString(LectureSessionMember.MULTICAST_GROUP_ADDRESS.toString(), Objects.requireNonNull(multicastGroupEditText.getText()).toString().trim());
 
                         LectureSessionPage lectureSessionPage = new LectureSessionPage();
                         lectureSessionPage.setArguments(bundle);
@@ -102,50 +101,14 @@ public class LectureHomePage extends Fragment {
         }
     }
 
-    private String generateMulticastAddress(){
-        Random rand = new Random();
-        return "239." + rand.nextInt(256) + "." + rand.nextInt(256) + "." + rand.nextInt(256);
-    }
 
     private View.OnClickListener multicastGroupRefreshIconClickEvent() {
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                multicastGroupEditText.setText(generateMulticastAddress());
+                multicastGroupEditText.setText(MulticastAddressGenerator.generateMulticastAddress());
             }
         };
-    }
-
-    private Boolean validateMulticastGroupAddress(String multicastAddress){
-        InetAddress group;
-        MulticastSocket socket = null;
-
-        try {
-            group = InetAddress.getByName(multicastAddress);
-
-            if(!group.isMulticastAddress()){
-                // address not a valid multicast group address
-                return false;
-            }
-
-            try {
-                socket = new MulticastSocket(0);
-                socket.setReuseAddress(true);
-                socket.joinGroup(group);
-                return true;
-            } catch (Exception e) {
-                // address is already in use
-                return false;
-            } finally {
-                if (socket != null) {
-                    socket.leaveGroup(group);
-                    socket.close();
-                }
-            }
-        } catch (Exception e) {
-            Log.e(Constants.LECTURE_HOME_PAGE_LOG_TAG, "Error validating multicast group address: " + e.getMessage());
-            return false;
-        }
     }
 
 }

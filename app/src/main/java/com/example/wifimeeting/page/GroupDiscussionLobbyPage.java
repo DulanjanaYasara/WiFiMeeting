@@ -17,20 +17,19 @@ import com.example.wifimeeting.components.groupitem.DiscussionGroupItem;
 import com.example.wifimeeting.components.groupitem.ListGroupItemAdapter;
 import com.example.wifimeeting.navigation.BackPressedListener;
 import com.example.wifimeeting.navigation.NavigationHost;
-import com.example.wifimeeting.usecase.smallgroupdiscussion.CreateMeetingBroadcast;
-import com.example.wifimeeting.utils.AddressGenerator;
+import com.example.wifimeeting.transmission.CreateMeetingBroadcast;
+import com.example.wifimeeting.utils.BroadcastAddressGenerator;
 import com.example.wifimeeting.utils.Constants;
 import com.example.wifimeeting.utils.GroupDiscussionMember;
+import com.example.wifimeeting.utils.MulticastAddressGenerator;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.net.InetAddress;
-import java.net.MulticastSocket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class GroupDiscussionLobbyPage extends Fragment implements BackPressedListener {
 
@@ -40,7 +39,6 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
     TextInputEditText groupNameEditText, multicastGroupEditText;
     Handler handler = new Handler();
     private String name = null;
-    private int port;
     private InetAddress broadcastIp;
     private int selectedDiscussionGroupIndex;
 
@@ -68,11 +66,9 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
         if(this.getArguments() != null){
             Bundle bundle = this.getArguments();
             name = bundle.getString(GroupDiscussionMember.NAME.toString());
-            port = bundle.getInt(GroupDiscussionMember.PORT.toString());
-
             groupNameEditText.setText(name + Constants.GROUP_SUFFIX);
         }
-        multicastGroupEditText.setText(generateMulticastAddress());
+        multicastGroupEditText.setText(MulticastAddressGenerator.generateMulticastAddress());
 
         initiateGroupListTextView(view);
         groupListTextView.setOnItemClickListener(arraylistClickItemEvent());
@@ -80,7 +76,7 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
         joinButton.setOnClickListener(joinButtonClickEvent());
         createButton.setOnClickListener(createButtonClickEvent());
 
-        AddressGenerator addressGenerator = new AddressGenerator(view);
+        BroadcastAddressGenerator addressGenerator = new BroadcastAddressGenerator(view);
         broadcastIp = addressGenerator.getBroadcastIp();
 
         initializeGroupDiscussion();
@@ -224,16 +220,11 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
         }
     }
 
-    private String generateMulticastAddress(){
-        Random rand = new Random();
-        return "239." + rand.nextInt(256) + "." + rand.nextInt(256) + "." + rand.nextInt(256);
-    }
-
     private View.OnClickListener multicastGroupRefreshIconClickEvent() {
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                multicastGroupEditText.setText(generateMulticastAddress());
+                multicastGroupEditText.setText(MulticastAddressGenerator.generateMulticastAddress());
             }
         };
     }
@@ -261,11 +252,10 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
 
                         Bundle bundle = new Bundle();
                         bundle.putString(GroupDiscussionMember.NAME.toString(), name);
-                        bundle.putBoolean(GroupDiscussionMember.IS_MUTE.toString(), true);
-                        bundle.putString(GroupDiscussionMember.GROUP_NAME.toString(), groupDiscussionDetails.get(selectedDiscussionGroupIndex).getGroupName());
-                        bundle.putBoolean(GroupDiscussionMember.IS_ADMIN.toString(), false);
-                        bundle.putInt(GroupDiscussionMember.PORT.toString(), port);
                         bundle.putString(GroupDiscussionMember.MULTICAST_GROUP_ADDRESS.toString(), groupDiscussionDetails.get(selectedDiscussionGroupIndex).getMulticastGroupAddress().getHostAddress());
+                        bundle.putString(GroupDiscussionMember.GROUP_NAME.toString(), groupDiscussionDetails.get(selectedDiscussionGroupIndex).getGroupName());
+                        bundle.putString(GroupDiscussionMember.ROLE.toString(), Constants.NON_ADMIN_ROLE.toString());
+
 
                         GroupDiscussionPage groupDiscussionPage = new GroupDiscussionPage();
                         groupDiscussionPage.setArguments(bundle);
@@ -296,7 +286,7 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
                 if (groupNameTextInput.getError() == null && multicastGroupTextInput.getError() == null) {
 
                     String multicastGroupAddress = multicastGroupEditText.getText().toString().trim();
-                    if(!validateMulticastGroupAddress(multicastGroupAddress)){
+                    if(!MulticastAddressGenerator.validateMulticastGroupAddress(multicastGroupAddress)){
                         Snackbar.make(view, R.string.multicast_group_address_validation_error, Snackbar.LENGTH_SHORT).show();
                         return;
                     }
@@ -309,11 +299,10 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
 
                     Bundle bundle = new Bundle();
                     bundle.putString(GroupDiscussionMember.NAME.toString(), name);
-                    bundle.putBoolean(GroupDiscussionMember.IS_MUTE.toString(), true);
-                    bundle.putString(GroupDiscussionMember.GROUP_NAME.toString(), groupNameEditText.getText().toString().trim());
-                    bundle.putBoolean(GroupDiscussionMember.IS_ADMIN.toString(), true);
-                    bundle.putInt(GroupDiscussionMember.PORT.toString(), port);
                     bundle.putString(GroupDiscussionMember.MULTICAST_GROUP_ADDRESS.toString(), multicastGroupAddress);
+                    bundle.putString(GroupDiscussionMember.GROUP_NAME.toString(), groupNameEditText.getText().toString().trim());
+                    bundle.putString(GroupDiscussionMember.ROLE.toString(), Constants.GROUP_ADMIN_ROLE.toString());
+
 
                     GroupDiscussionPage groupDiscussionPage = new GroupDiscussionPage();
                     groupDiscussionPage.setArguments(bundle);
@@ -323,38 +312,6 @@ public class GroupDiscussionLobbyPage extends Fragment implements BackPressedLis
                 }
             }
         };
-    }
-
-    private Boolean validateMulticastGroupAddress(String multicastAddress){
-        InetAddress group;
-        MulticastSocket socket = null;
-
-        try {
-            group = InetAddress.getByName(multicastAddress);
-
-            if(!group.isMulticastAddress()){
-                // address not a valid multicast group address
-                return false;
-            }
-
-            try {
-                socket = new MulticastSocket(0);
-                socket.setReuseAddress(true);
-                socket.joinGroup(group);
-                return true;
-            } catch (Exception e) {
-                // address is already in use
-                return false;
-            } finally {
-                if (socket != null) {
-                    socket.leaveGroup(group);
-                    socket.close();
-                }
-            }
-        } catch (Exception e) {
-            Log.e(Constants.GROUP_DISCUSSION_LOBBY_PAGE_LOG_TAG, "Error validating multicast group address: " + e.getMessage());
-            return false;
-        }
     }
 
 }

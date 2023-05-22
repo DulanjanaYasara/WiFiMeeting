@@ -16,6 +16,7 @@ import com.example.wifimeeting.page.GroupDiscussionLobbyPage;
 import com.example.wifimeeting.page.GroupDiscussionPage;
 import com.example.wifimeeting.page.LectureSessionPage;
 import com.example.wifimeeting.page.StartupPage;
+import com.example.wifimeeting.page.StudentHomePage;
 import com.example.wifimeeting.utils.Constants;
 
 public class MainActivity extends AppCompatActivity implements NavigationHost {
@@ -70,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements NavigationHost {
             GroupDiscussionPage.backPressedListener.onBackPressed();
         else if (GroupDiscussionLobbyPage.backPressedListener != null)
             GroupDiscussionLobbyPage.backPressedListener.onBackPressed();
+        else if (StudentHomePage.backPressedListener != null)
+            StudentHomePage.backPressedListener.onBackPressed();
         else
             super.onBackPressed();
     }

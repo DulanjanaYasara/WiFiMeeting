@@ -1,9 +1,11 @@
-package com.example.wifimeeting.usecase.smallgroupdiscussion;
+package com.example.wifimeeting.transmission;
 
 import android.util.Log;
 
 import com.example.wifimeeting.page.GroupDiscussionLobbyPage;
 import com.example.wifimeeting.page.GroupDiscussionPage;
+import com.example.wifimeeting.page.LectureSessionPage;
+import com.example.wifimeeting.page.StudentHomePage;
 import com.example.wifimeeting.utils.Constants;
 
 import java.net.DatagramPacket;
@@ -27,7 +29,7 @@ public class CreateMeetingBroadcast{
     /**
      * Broadcast the CREATE 
      */
-    public void broadcastCreate(GroupDiscussionPage groupDiscussionUi, String action, String groupName, String multicastAddress) {
+    public void broadcastCreate(Object uiPage, String action, String meetingName, String multicastAddress) {
 
         Log.i(Constants.CREATE_MEETING_LOG_TAG, "Broadcasting CREATE Action started!");
         Thread broadcastThread = new Thread(new Runnable() {
@@ -41,12 +43,24 @@ public class CreateMeetingBroadcast{
                     socket.setBroadcast(true);
 
                     while(BROADCAST) {
-                        String request = action + groupName + Constants.STRING_SEPARATOR + multicastAddress + Constants.STRING_SEPARATOR + groupDiscussionUi.getMemberHashMapSize();
+
+                        String request = null;
+                        if(uiPage instanceof GroupDiscussionPage)
+                            request = action + multicastAddress + Constants.STRING_SEPARATOR + meetingName + Constants.STRING_SEPARATOR + ((GroupDiscussionPage) uiPage).getMemberHashMapSize();
+                        else if(uiPage instanceof LectureSessionPage)
+                            request = action + multicastAddress + Constants.STRING_SEPARATOR + meetingName;
+                        else {
+                            Log.e(Constants.CREATE_MEETING_LOG_TAG, "Create meeting broadcasting UI page not identified!");
+                            return;
+                        }
+
                         byte[] message = request.getBytes();
                         DatagramPacket packet = new DatagramPacket(message, message.length, broadcastIP, Constants.MARK_CREATE_BROADCAST_PORT);
 
                         socket.send(packet);
                         Log.i(Constants.CREATE_MEETING_LOG_TAG, "CREATE Action Broadcast packet sent: " + packet.getAddress().toString());
+
+                        //broadcasting interval can be customized
                         Thread.sleep(Constants.CREATE_MEETING_BROADCAST_INTERVAL);
                     }
                     Log.i(Constants.CREATE_MEETING_LOG_TAG, "CREATE Action Broadcast ending!");
@@ -78,7 +92,7 @@ public class CreateMeetingBroadcast{
     /**
      * Listening thread for create meeting
      */
-    public void listenCreateMeeting(GroupDiscussionLobbyPage discussionLobbyUi) {
+    public void listenCreateMeeting(Object listeningUiPage) {
 
         Log.i(Constants.CREATE_MEETING_LOG_TAG, "Listening started for create meeting!");
 
@@ -126,14 +140,17 @@ public class CreateMeetingBroadcast{
                     List<String> dataList = Arrays.asList(data.split(Constants.STRING_SEPARATOR));
 
                     String receivedAction = dataList.get(0).substring(0, 2);
-                    String groupName = dataList.get(0).substring(2);
-                    String multicastIpAddress = dataList.get(1);
-                    String noOfMembers = dataList.get(dataList.size()-1);
+                    String multicastIpAddress = dataList.get(0).substring(2);
+                    String meetingName = dataList.get(1);
 
-                    if (receivedAction.equals(Constants.CREATE_ACTION)) {
+                    if (receivedAction.equals(Constants.CREATE_ACTION) && listeningUiPage instanceof GroupDiscussionLobbyPage) {
                         Log.i(Constants.CREATE_MEETING_LOG_TAG, "Create Meeting Listener received CREATE request");
+                        String noOfMembers = dataList.get(dataList.size() - 1);
+                        ((GroupDiscussionLobbyPage) listeningUiPage).updateGroupDiscussionDetails(meetingName, multicastIpAddress, noOfMembers);
 
-                        discussionLobbyUi.updateGroupDiscussionDetails(groupName, multicastIpAddress, noOfMembers);
+                    } else if (receivedAction.equals(Constants.CREATE_ACTION) && listeningUiPage instanceof StudentHomePage) {
+                        Log.i(Constants.CREATE_MEETING_LOG_TAG, "Create Meeting Listener received CREATE request");
+                        ((StudentHomePage) listeningUiPage).updateModuleDetails(meetingName, multicastIpAddress);
 
                     } else {
                         Log.w(Constants.CREATE_MEETING_LOG_TAG, "Create Meeting Listener received invalid request: " + receivedAction);

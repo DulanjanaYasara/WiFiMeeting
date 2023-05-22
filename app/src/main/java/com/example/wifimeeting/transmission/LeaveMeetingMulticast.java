@@ -1,8 +1,9 @@
-package com.example.wifimeeting.usecase.smallgroupdiscussion;
+package com.example.wifimeeting.transmission;
 
 import android.util.Log;
 
 import com.example.wifimeeting.page.GroupDiscussionPage;
+import com.example.wifimeeting.page.LectureSessionPage;
 import com.example.wifimeeting.utils.Constants;
 
 import java.io.IOException;
@@ -15,10 +16,10 @@ import java.net.SocketTimeoutException;
 public class LeaveMeetingMulticast {
 
     private boolean LISTEN_LEAVE_MEETING = true;
-    private GroupDiscussionPage uiPage;
+    private Object uiPage;
     private InetAddress multicastIP;
 
-    public LeaveMeetingMulticast(GroupDiscussionPage uiPage, InetAddress multicastIP) {
+    public LeaveMeetingMulticast(Object uiPage, InetAddress multicastIP) {
         this.uiPage = uiPage;
         this.multicastIP = multicastIP;
 
@@ -60,7 +61,6 @@ public class LeaveMeetingMulticast {
         });
         multicastThread.start();
     }
-
 
     /**
      * Listening thread for leave meeting
@@ -122,14 +122,25 @@ public class LeaveMeetingMulticast {
                     String receivedAction = data.substring(0, 2);
                     String receiverName = data.substring(2);
 
-                    if (receivedAction.equals(Constants.LEAVE_ACTION)) {
+                    if (receivedAction.equals(Constants.LEAVE_ACTION) && uiPage instanceof GroupDiscussionPage) {
                         Log.i(Constants.LEAVE_MEETING_LOG_TAG, "Leave Meeting Listener received LEAVE request");
-                        uiPage.updateMemberHashMap(receivedAction, receiverName, true);
+                        ((GroupDiscussionPage) uiPage).updateMemberHashMap(receivedAction, receiverName, true);
                         multicastLeaveAbsent(Constants.ABSENT_ACTION, receiverName);
                     
-                    } else  if (receivedAction.equals(Constants.ABSENT_ACTION)) {
+                    } else  if (receivedAction.equals(Constants.ABSENT_ACTION) && uiPage instanceof GroupDiscussionPage) {
                         Log.i(Constants.LEAVE_MEETING_LOG_TAG, "Leave Meeting Listener received ABSENT request");
-                        uiPage.updateMemberHashMap(receivedAction, receiverName, true);
+                        ((GroupDiscussionPage) uiPage).updateMemberHashMap(receivedAction, receiverName, true);
+
+                    } else if (receivedAction.equals(Constants.LEAVE_ACTION) && uiPage instanceof LectureSessionPage) {
+                        Log.i(Constants.LEAVE_MEETING_LOG_TAG, "Leave Meeting Listener received LEAVE request");
+                        ((LectureSessionPage) uiPage).updateMemberHashMap(receivedAction, receiverName, true);
+                        multicastLeaveAbsent(Constants.ABSENT_ACTION, receiverName);
+
+                    } else  if (receivedAction.equals(Constants.ABSENT_ACTION) && uiPage instanceof LectureSessionPage) {
+                        Log.i(Constants.LEAVE_MEETING_LOG_TAG, "Leave Meeting Listener received ABSENT request");
+                        ((LectureSessionPage) uiPage).updateMemberHashMap(receivedAction, receiverName, true);
+
+
                     } else {
                         Log.w(Constants.LEAVE_MEETING_LOG_TAG, "Leave Meeting Listener received invalid request: " + receivedAction);
                     }

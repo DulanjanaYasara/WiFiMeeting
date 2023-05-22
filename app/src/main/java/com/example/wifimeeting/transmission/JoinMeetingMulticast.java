@@ -1,8 +1,9 @@
-package com.example.wifimeeting.usecase.smallgroupdiscussion;
+package com.example.wifimeeting.transmission;
 
 import android.util.Log;
 
 import com.example.wifimeeting.page.GroupDiscussionPage;
+import com.example.wifimeeting.page.LectureSessionPage;
 import com.example.wifimeeting.utils.Constants;
 
 import java.io.IOException;
@@ -15,12 +16,12 @@ import java.net.SocketTimeoutException;
 public class JoinMeetingMulticast {
 
     private boolean LISTEN_JOIN_MEETING = true;
-    private GroupDiscussionPage uiPage;
+    private Object uiPage;
     private InetAddress multicastIP;
     private String name;
     private Boolean isMute;
 
-    public JoinMeetingMulticast(GroupDiscussionPage uiPage, String name, Boolean isMute, InetAddress multicastIP) {
+    public JoinMeetingMulticast(Object uiPage, String name, Boolean isMute, InetAddress multicastIP) {
         this.uiPage = uiPage;
         this.multicastIP = multicastIP;
         this.name = name;
@@ -126,14 +127,23 @@ public class JoinMeetingMulticast {
                     String receiverName = data.substring(2, data.length() - 1);
                     Boolean isMuteValue = data.endsWith("1");
 
-                    if (receivedAction.equals(Constants.JOIN_ACTION)) {
+                    if (receivedAction.equals(Constants.JOIN_ACTION) && uiPage instanceof GroupDiscussionPage) {
                         Log.i(Constants.JOIN_MEETING_LOG_TAG, "Join Meeting Listener received JOIN request");
-                        uiPage.updateMemberHashMap(receivedAction, receiverName, isMuteValue);
+                        ((GroupDiscussionPage) uiPage).updateMemberHashMap(receivedAction, receiverName, isMuteValue);
                         multicastJoinPresent(Constants.PRESENT_ACTION, name, isMute);
 
-                    } else  if (receivedAction.equals(Constants.PRESENT_ACTION)) {
+                    } else  if (receivedAction.equals(Constants.PRESENT_ACTION) && uiPage instanceof GroupDiscussionPage) {
                         Log.i(Constants.JOIN_MEETING_LOG_TAG, "Join Meeting Listener received PRESENT request");
-                        uiPage.updateMemberHashMap(receivedAction, receiverName, isMuteValue);
+                        ((GroupDiscussionPage) uiPage).updateMemberHashMap(receivedAction, receiverName, isMuteValue);
+
+                    } else if (receivedAction.equals(Constants.JOIN_ACTION) && uiPage instanceof LectureSessionPage) {
+                            Log.i(Constants.JOIN_MEETING_LOG_TAG, "Join Meeting Listener received JOIN request");
+                            ((LectureSessionPage) uiPage).updateMemberHashMap(receivedAction, receiverName, isMuteValue);
+                            multicastJoinPresent(Constants.PRESENT_ACTION, name, isMute);
+
+                    } else  if (receivedAction.equals(Constants.PRESENT_ACTION) && uiPage instanceof LectureSessionPage) {
+                        Log.i(Constants.JOIN_MEETING_LOG_TAG, "Join Meeting Listener received PRESENT request");
+                        ((LectureSessionPage) uiPage).updateMemberHashMap(receivedAction, receiverName, isMuteValue);
 
                     } else {
                         Log.w(Constants.JOIN_MEETING_LOG_TAG, "Join Meeting Listener received invalid request: " + receivedAction);

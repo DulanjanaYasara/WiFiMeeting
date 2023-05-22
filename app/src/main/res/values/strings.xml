@@ -42,7 +42,9 @@
     <string name="multicast_group_address_mandatory">Multicast Group Address Required</string>
     <string name="multicast_group_address_validation_error">Multicast Group Address INVALID or already OCCUPIED</string>
     <string name="group_does_not_exist">Group does not exist!</string>
+    <string name="module_does_not_exist">Module does not exist!</string>
     <string name="admin_end_meeting">Admin End the Group Discussion!</string>
+    <string name="lecture_session_ended">Lecture Session Ended!</string>
 
 
     <string name="username">Username</string>
@@ -58,4 +60,5 @@
     <string name="multicast_group_address">Multicast Group Address</string>
     <string name="or">or</string>
     <string name="member_name">Member Name</string>
+    <string name="module_name">Module Name</string>
 </resources>
