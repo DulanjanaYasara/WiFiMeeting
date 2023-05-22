@@ -39,13 +39,17 @@ public class MuteUnmuteMeetingMulticast {
 
                 MulticastSocket socket = null;
                 try {
-                    String request = action + name + (isMute ? "1" : "0");
-                    byte[] message = request.getBytes();
-                    socket = new MulticastSocket();
+                    for(int i=0; i <=Constants.MUTE_UNMUTE_MULTICAST_TIMES; i++){
+                        String request = action + name + (isMute ? "1" : "0");
+                        byte[] message = request.getBytes();
+                        socket = new MulticastSocket();
 
-                    DatagramPacket packet = new DatagramPacket(message, message.length, multicastIP, Constants.MUTE_UNMUTE_MULTICAST_PORT);
-                    socket.send(packet);
-                    Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "MUTE UNMUTE Action Multicast packet sent: " + packet.getAddress().toString());
+                        DatagramPacket packet = new DatagramPacket(message, message.length, multicastIP, Constants.MUTE_UNMUTE_MULTICAST_PORT);
+                        socket.send(packet);
+                        Log.i(Constants.MUTE_UNMUTE_LOG_TAG, "MUTE UNMUTE Action Multicast packet sent: " + packet.getAddress().toString());
+
+                        Thread.sleep(500);
+                    }
 
                 } catch (Exception e) {
                     Log.e(Constants.MUTE_UNMUTE_LOG_TAG, "Exception in MUTE UNMUTE Action multicast: " + e);

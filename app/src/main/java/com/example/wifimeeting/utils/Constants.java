@@ -14,6 +14,7 @@ public class Constants {
     public static final String STUDENT_ROLE = "Student";
     public static final int CLASSROOM_LECTURE_HEARTBEAT_INTERVAL = 5000; // 5 seconds
     public static final int CLASSROOM_LECTURE_DISCOVERY_TIMEOUT_MILLISECONDS = 15000;
+    public static final int MUTE_UNMUTE_MULTICAST_TIMES = 2;
 
     //Small Group Discussion Session
     public static final String GROUP_ADMIN_ROLE = "GroupAdmin";
