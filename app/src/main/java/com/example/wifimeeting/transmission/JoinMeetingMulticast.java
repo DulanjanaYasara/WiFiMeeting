@@ -129,8 +129,9 @@ public class JoinMeetingMulticast {
 
                     if (receivedAction.equals(Constants.JOIN_ACTION) && uiPage instanceof GroupDiscussionPage) {
                         Log.i(Constants.JOIN_MEETING_LOG_TAG, "Join Meeting Listener received JOIN request");
-                        ((GroupDiscussionPage) uiPage).updateMemberHashMap(receivedAction, receiverName, isMuteValue);
-                        multicastJoinPresent(Constants.PRESENT_ACTION, name, isMute);
+                        GroupDiscussionPage groupDiscussionPage = ((GroupDiscussionPage) uiPage);
+                        groupDiscussionPage.updateMemberHashMap(receivedAction, receiverName, isMuteValue);
+                        multicastJoinPresent(Constants.PRESENT_ACTION, name, groupDiscussionPage.getCurrentIsMute());
 
                     } else  if (receivedAction.equals(Constants.PRESENT_ACTION) && uiPage instanceof GroupDiscussionPage) {
                         Log.i(Constants.JOIN_MEETING_LOG_TAG, "Join Meeting Listener received PRESENT request");
@@ -138,8 +139,9 @@ public class JoinMeetingMulticast {
 
                     } else if (receivedAction.equals(Constants.JOIN_ACTION) && uiPage instanceof LectureSessionPage) {
                             Log.i(Constants.JOIN_MEETING_LOG_TAG, "Join Meeting Listener received JOIN request");
-                            ((LectureSessionPage) uiPage).updateMemberHashMap(receivedAction, receiverName, isMuteValue);
-                            multicastJoinPresent(Constants.PRESENT_ACTION, name, isMute);
+                            LectureSessionPage lectureSessionPage = ((LectureSessionPage) uiPage);
+                            lectureSessionPage.updateMemberHashMap(receivedAction, receiverName, isMuteValue);
+                            multicastJoinPresent(Constants.PRESENT_ACTION, name, lectureSessionPage.getCurrentIsMute());
 
                     } else  if (receivedAction.equals(Constants.PRESENT_ACTION) && uiPage instanceof LectureSessionPage) {
                         Log.i(Constants.JOIN_MEETING_LOG_TAG, "Join Meeting Listener received PRESENT request");

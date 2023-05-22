@@ -171,6 +171,10 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
         endMeeting.stopListeningEndMeeting();
     }
 
+    public synchronized boolean getCurrentIsMute(){
+        return isMute;
+    }
+
     public synchronized void updateMemberHashMap(String action, String nameValue, Boolean isMuteValue){
 
         switch(action){
