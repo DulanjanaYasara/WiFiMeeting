@@ -257,12 +257,13 @@ public class LectureSessionPage extends Fragment implements BackPressedListener{
 
         requireFragmentManager().popBackStack();
         if(isAdminTriggered){
+            endMeeting.multicastEndMeeting(Constants.END_ACTION, this);
             Snackbar.make(this.requireView(), R.string.lecture_session_ended, Snackbar.LENGTH_SHORT).show();
         }
 
         //if admin leaves then multicast all members have to leave
         if(role.equals(Constants.LECTURER_ROLE)){
-            endMeeting.multicastEndMeeting(Constants.END_ACTION);
+            endMeeting.multicastEndMeeting(Constants.END_ACTION, this);
             createMeeting.stopBroadcasting();
         }
 

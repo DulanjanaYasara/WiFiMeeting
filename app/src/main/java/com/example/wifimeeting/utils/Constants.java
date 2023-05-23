@@ -25,10 +25,9 @@ public class Constants {
     public static final int GROUP_DISCUSSION_HEARTBEAT_INTERVAL = 5000; // 5 seconds
     public static final int GROUP_DISCUSSION_DISCOVERY_TIMEOUT_MILLISECONDS = 15000;
     public static final int SMALL_GROUP_DISCUSSION_MEMBER_MAX_COUNT = 2;
-
     public static final int JOIN_GROUP_DISCUSSION_REFRESH_TIMEOUT_MILLISECONDS = 5000;
     public static final int GROUP_DISCUSSION_JOIN_UPDATE_INTERVAL = 500;
-
+    public static final int GROUP_DISCUSSION_END_MEETING_MULTICAST_TIMES = 2;
 
     //    Lecturer Credentials
     public static final String SEC_USERNAME = "user";
@@ -43,7 +42,6 @@ public class Constants {
     public static final String CREATE_ACTION = "CR";
     public static final String END_ACTION = "EN";
     public static final String UPDATE_ACTION = "UP";
-
 
     //Port Allocation for Broadcast
     public static final int MARK_CREATE_BROADCAST_PORT = 50004;
@@ -60,7 +58,6 @@ public class Constants {
     public static final int SAMPLE_RATE = 8000; // Hertz
     public static final int SAMPLE_INTERVAL = 20; // Milliseconds
     public static final int SAMPLE_SIZE = 2; // Bytes
-
     public static final int BROADCAST_BUF_SIZE = 1024;
     public static final int MULTICAST_BUF_SIZE = 1024;
 
@@ -77,6 +74,5 @@ public class Constants {
     public static final String END_MEETING_LOG_TAG = "EndMeeting";
     public static final String UPDATE_MEMBERS = "UpdateMembers";
     public static final String ADDRESS_GENERATOR_LOG_TAG = "AddressGenerator";
-
 
 }

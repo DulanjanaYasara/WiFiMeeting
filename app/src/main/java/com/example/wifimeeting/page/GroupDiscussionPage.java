@@ -244,12 +244,13 @@ public class GroupDiscussionPage extends Fragment implements BackPressedListener
 
         requireFragmentManager().popBackStack();
         if(isAdminTriggered){
+            endMeeting.multicastEndMeeting(Constants.END_ACTION, this);
             Snackbar.make(this.requireView(), R.string.admin_end_meeting, Snackbar.LENGTH_SHORT).show();
         }
 
         //if admin leaves then multicast all members have to leave
         if(Constants.GROUP_ADMIN_ROLE.toString().equals(role)){
-            endMeeting.multicastEndMeeting(Constants.END_ACTION);
+            endMeeting.multicastEndMeeting(Constants.END_ACTION, this);
             createMeeting.stopBroadcasting();
         }
 

@@ -25,7 +25,7 @@ public class EndMeetingMulticast {
     /**
      * Multicast the END
      */
-    public void multicastEndMeeting(String action) {
+    public void multicastEndMeeting(String action, Object uiPage) {
 
         Log.i(Constants.END_MEETING_LOG_TAG, "Multicasting END Action started!");
         Thread multicastThread = new Thread(new Runnable() {
@@ -35,12 +35,20 @@ public class EndMeetingMulticast {
                 MulticastSocket socket = null;
 
                 try {
-                    byte[] message = action.getBytes();
-                    socket = new MulticastSocket();
+                    int noOfMessagesSent = 1;
+                    if(uiPage instanceof GroupDiscussionPage)
+                        noOfMessagesSent = Constants.GROUP_DISCUSSION_END_MEETING_MULTICAST_TIMES;
 
-                    DatagramPacket packet = new DatagramPacket(message, message.length, multicastIP, Constants.MARK_END_MULTICAST_PORT);
-                    socket.send(packet);
-                    Log.i(Constants.END_MEETING_LOG_TAG, "END Action Multicast packet sent: " + packet.getAddress().toString());
+                    for(int i=0; i <= noOfMessagesSent; i++){
+                        byte[] message = action.getBytes();
+                        socket = new MulticastSocket();
+
+                        DatagramPacket packet = new DatagramPacket(message, message.length, multicastIP, Constants.MARK_END_MULTICAST_PORT);
+                        socket.send(packet);
+                        Log.i(Constants.END_MEETING_LOG_TAG, "END Action Multicast packet sent: " + packet.getAddress().toString());
+
+                        Thread.sleep(500);
+                    }
 
                 } catch (Exception e) {
                     Log.e(Constants.END_MEETING_LOG_TAG, "Exception in END Action multicast: " + e);
